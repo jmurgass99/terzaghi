@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geojm"
+version = "0.1.0"
+description = "Geotecnia y fundaciones — P-y curves, SSI, Mander"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "jmstructural-common"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["geojm*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv.sources]
+jmstructural-common = { workspace = true }
