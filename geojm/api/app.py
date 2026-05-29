@@ -150,6 +150,75 @@ def create_router() -> Any:
             "G_soil_MPa": r.G_soil_MPa,
         }
 
+    class SsiSpringsPayload(BaseModel):
+        L_m: float = Field(..., gt=0)
+        B_m: float = Field(..., gt=0)
+        Vs_m_per_s: float = Field(..., gt=0)
+        rho_soil_kg_m3: float = Field(1900.0, gt=0)
+        nu_soil: float = Field(0.35, ge=0, le=0.5)
+        frequency_Hz: float = Field(5.0, gt=0)
+        material_damping: float = Field(0.05, ge=0, le=0.5)
+
+    @router.post("/api/geo/ssi-springs")
+    def ssi_springs(payload: SsiSpringsPayload):
+        """Resortes dinámicos y dashpots equivalentes de fundación superficial (Gazetas/Novak)."""
+        from ..ssi_springs import SsiSpringsInput, calculate_ssi_springs
+        try:
+            r = calculate_ssi_springs(SsiSpringsInput(**payload.model_dump()))
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        return r.model_dump()
+
+    class MonopileDynamicPyPayload(BaseModel):
+        z_m: float = Field(..., ge=0.0)
+        D_m: float = Field(..., gt=0.0)
+        Vs_m_per_s: float = Field(..., gt=0.0)
+        rho_soil_kg_m3: float = Field(1900.0, gt=0.0)
+        soil_type: str = Field("clay")
+        su_kPa: float = Field(100.0, ge=0.0)
+        phi_deg: float = Field(32.0, ge=0.0, le=50.0)
+        gamma_kN_m3: float = Field(18.0, gt=0.0)
+        eps_50: float = Field(0.01, gt=0.0)
+        k_pH_kN_m3: float = Field(25000.0, gt=0.0)
+        frequency_Hz: float = Field(0.2, gt=0.0)
+        num_cycles: int = Field(1000, ge=1)
+        degradation_coef: float = Field(0.08, ge=0.0, le=0.3)
+        dynamic_coef: float = Field(0.15, ge=0.0, le=0.5)
+        n_points: int = Field(50, ge=10, le=200)
+
+    @router.post("/api/geo/monopile")
+    def monopile_dynamic_py(payload: MonopileDynamicPyPayload):
+        """Curvas P-y dinámicas y cíclicas para monopilotes eólicos de gran diámetro."""
+        from ..piles.dynamic_py import MonopileDynamicPyInput, calculate_monopile_dynamic_py
+        try:
+            r = calculate_monopile_dynamic_py(MonopileDynamicPyInput(**payload.model_dump()))
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        return r.model_dump()
+
+    class TunnelWinklerPayload(BaseModel):
+        R0_m: float = Field(..., gt=0.0)
+        P0_kPa: float = Field(..., gt=0.0)
+        E_soil_MPa: float = Field(..., gt=0.0)
+        nu_soil: float = Field(0.30, ge=0.0, le=0.5)
+        c_kPa: float = Field(..., ge=0.0)
+        phi_deg: float = Field(..., ge=0.0, le=50.0)
+        E_liner_GPa: float = Field(30.0, gt=0.0)
+        nu_liner: float = Field(0.20, ge=0.0, le=0.4)
+        thickness_mm: float = Field(200.0, gt=0.0)
+        unsupported_convergence_ratio: float = Field(0.30, ge=0.0, le=0.9)
+        n_points: int = Field(50, ge=10, le=200)
+
+    @router.post("/api/geo/tunnel-winkler")
+    def tunnel_winkler(payload: TunnelWinklerPayload):
+        """Análisis de convergencia-confinamiento y resortes Winkler elastoplásticos para túneles."""
+        from ..tunnels import TunnelWinklerInput, calculate_tunnel_confinement
+        try:
+            r = calculate_tunnel_confinement(TunnelWinklerInput(**payload.model_dump()))
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        return r.model_dump()
+
     return router
 
 
