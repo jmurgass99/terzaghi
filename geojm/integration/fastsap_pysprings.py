@@ -56,13 +56,14 @@ def export_to_fastsap(cfg: FastSAPPySpringsConfig, client: Any = None,
     if dry_run or client is None:
         return {"curves": curves, "applied": len(curves), "dry_run": True}
     applied = 0
+    failed: dict[str, str] = {}
     for name, pts in curves.items():
         try:
             client.PropLink.SetMultiLinearPlastic(name, len(pts), [p[0] for p in pts], [p[1] for p in pts])
             applied += 1
-        except Exception:  # pragma: no cover
-            pass
-    return {"curves": curves, "applied": applied, "dry_run": False}
+        except Exception as exc:  # registra el fallo, no lo traga en silencio
+            failed[name] = str(exc)
+    return {"curves": curves, "applied": applied, "failed": failed, "dry_run": False}
 
 
 __all__ = ["PySpringNode", "FastSAPPySpringsConfig", "build_py_curve", "export_to_fastsap"]
