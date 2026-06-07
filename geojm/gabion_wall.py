@@ -57,9 +57,22 @@ class GabionCheck:
 
 
 def Ka_rankine(phi_deg: float) -> float:
-    """Coeficiente de empuje activo de Rankine: (1-sin) / (1+sin)."""
+    """Coeficiente de empuje activo de Rankine: (1-sin) / (1+sin).
+
+    Equivale a tan^2(45 - phi/2). EC7 §9, relleno horizontal sin friccion muro.
+    """
     s = math.sin(math.radians(phi_deg))
     return (1.0 - s) / (1.0 + s)
+
+
+def Kp_rankine(phi_deg: float) -> float:
+    """Coeficiente de empuje pasivo de Rankine: (1+sin) / (1-sin).
+
+    Equivale a tan^2(45 + phi/2) y es el reciproco exacto de ``Ka_rankine``
+    (Ka * Kp = 1). EC7 §9, relleno horizontal sin friccion muro.
+    """
+    s = math.sin(math.radians(phi_deg))
+    return (1.0 + s) / (1.0 - s)
 
 
 @dataclass
@@ -218,5 +231,5 @@ class GabionWall:
 
 __all__ = [
     "GabionLayer", "GabionSoil", "GabionWall", "GabionCheck",
-    "Ka_rankine", "DESIGN_APPROACHES",
+    "Ka_rankine", "Kp_rankine", "DESIGN_APPROACHES",
 ]

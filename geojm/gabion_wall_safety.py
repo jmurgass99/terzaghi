@@ -53,9 +53,14 @@ def mononobe_okabe_seismic_coefficient(
     psi = math.atan(kh / (1.0 - kv))
     
     numerator = (math.cos(phi - psi - beta)) ** 2
+    # M-O = Coulomb en un campo rotado el angulo sismico psi: TODO termino del
+    # trasdos relativo a la vertical recibe +psi, incluido el del radical
+    # (cos(beta+delta+psi)). El termino del relleno relativo al muro
+    # (cos(theta-beta)) NO lo recibe. Sin este +psi, Kae(W00704) sale 0.485 en
+    # vez de 0.471 (ficha). Ref. EC8; Mononobe-Okabe.
     denominator_part = math.sqrt(
         (math.sin(phi + delta) * math.sin(phi - psi - theta)) /
-        (math.cos(beta + delta) * math.cos(theta - beta))
+        (math.cos(beta + delta + psi) * math.cos(theta - beta))
     )
     denominator = math.cos(psi) * (math.cos(beta) ** 2) * math.cos(beta + delta + psi) * (1.0 + denominator_part) ** 2
     Kae = numerator / denominator if denominator else 0.0

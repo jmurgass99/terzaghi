@@ -7,6 +7,7 @@ from geojm.gabion_wall import (
     GabionSoil,
     GabionWall,
     Ka_rankine,
+    Kp_rankine,
     DESIGN_APPROACHES,
 )
 
@@ -22,6 +23,16 @@ class TestAnclas:
     def test_Ka(self):
         # phi=34 -> Ka = (1-sin)/(1+sin) ~ 0.28
         assert Ka_rankine(34.0) == pytest.approx(0.28, abs=0.005)
+
+    def test_Kp(self):
+        # Golden cerrado (EC7 §9): Kp = tan^2(45 + phi/2).
+        # phi=30 -> Kp = tan^2(60) = 3.0 exacto.
+        assert Kp_rankine(30.0) == pytest.approx(3.0, abs=1e-6)
+
+    def test_Ka_Kp_reciprocos(self):
+        # Rankine: Ka y Kp son reciprocos exactos (Ka * Kp = 1) para todo phi.
+        for phi in (20.0, 30.0, 34.0, 40.0):
+            assert Ka_rankine(phi) * Kp_rankine(phi) == pytest.approx(1.0, abs=1e-12)
 
     def test_geometria(self):
         w = _wall()
