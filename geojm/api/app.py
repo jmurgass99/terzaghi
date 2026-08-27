@@ -30,7 +30,7 @@ def create_router() -> Any:
         gamma_kN_m3: float = 17.0
         eps_50: float = 0.02
 
-    @router.post("/api/geo/py/matlock")
+    @router.post("/api/geo/py/matlock", summary="Curvas p-y para arcillas saturadas según formulación de Matlock (1970)")
     def py_matlock(payload: PYMatlockPayload) -> dict[str, list]:
         p, y = py_matlock_soft_clay(**payload.model_dump())
         return {"p_kN_per_m": p.tolist(), "y_m": y.tolist()}
@@ -42,7 +42,7 @@ def create_router() -> Any:
         gamma_kN_m3: float = 18.0
         k_pH_kN_m3: float = 25_000.0
 
-    @router.post("/api/geo/py/reese")
+    @router.post("/api/geo/py/reese", summary="Curvas p-y para arenas según formulación de Reese, Cox & Koop (1974)")
     def py_reese(payload: PYReesePayload) -> dict[str, list]:
         p, y = py_reese_sand(**payload.model_dump())
         return {"p_kN_per_m": p.tolist(), "y_m": y.tolist()}
@@ -51,7 +51,7 @@ def create_router() -> Any:
         s_over_D: float = Field(..., gt=0)
         rows: int = Field(..., ge=1)
 
-    @router.post("/api/geo/pile-group/lateral")
+    @router.post("/api/geo/pile-group/lateral", summary="Respuesta lateral de grupos de pilotes con factores p-multiplier")
     def pile_group(payload: GroupPayload):
         try:
             r = pile_group_efficiency_lateral(**payload.model_dump())
@@ -72,7 +72,7 @@ def create_router() -> Any:
         a_max_g: float = Field(..., gt=0)
         Mw: float = 7.5
 
-    @router.post("/api/geo/liquefaction")
+    @router.post("/api/geo/liquefaction", summary="Evaluación de licuefacción cíclica según método simplificado NCEER / Youd")
     def liquefaction(payload: LiquefactionPayload):
         try:
             r = evaluate_liquefaction(LiquefactionInput(**payload.model_dump()))
@@ -89,7 +89,7 @@ def create_router() -> Any:
         h_core_mm: float = Field(..., gt=0)
         s_mm: float = Field(..., gt=0)
 
-    @router.post("/api/geo/mander")
+    @router.post("/api/geo/mander", summary="Modelo constitutivo de confinamiento de hormigón de Mander (1988)")
     def mander(payload: ManderPayload):
         try:
             r = mander_confined_concrete(**payload.model_dump())
@@ -108,7 +108,7 @@ def create_router() -> Any:
         method: Literal["terzaghi", "meyerhof", "vesic", "brinch_hansen"] = "vesic"
         code: Literal["EU", "US"] = "EU"
 
-    @router.post("/api/geo/bearing-capacity")
+    @router.post("/api/geo/bearing-capacity", summary="Capacidad de carga admisible y de hundimiento según Brinch Hansen / Meyerhof")
     def bearing_capacity(payload: BearingPayload):
         """Capacidad portante de zapata superficial (Terzaghi/Meyerhof/Vesic/Hansen)."""
         try:
@@ -132,7 +132,7 @@ def create_router() -> Any:
         rho_soil_kg_m3: float = Field(1900.0, gt=0)
         nu_soil: float = Field(0.35, ge=0, le=0.5)
 
-    @router.post("/api/geo/gazetas-springs")
+    @router.post("/api/geo/gazetas-springs", summary="Rigideces dinámicas e impedancias de cimentación según Gazetas (1991)")
     def gazetas(payload: GazetasPayload):
         """Resortes de impedancia de fundación superficial (Gazetas 1991)."""
         from ..gazetas_springs import GazetasInput, evaluate_gazetas
@@ -159,7 +159,7 @@ def create_router() -> Any:
         frequency_Hz: float = Field(5.0, gt=0)
         material_damping: float = Field(0.05, ge=0, le=0.5)
 
-    @router.post("/api/geo/ssi-springs")
+    @router.post("/api/geo/ssi-springs", summary="Muelles desacoplados de interacción suelo-estructura (SSI)")
     def ssi_springs(payload: SsiSpringsPayload):
         """Resortes dinámicos y dashpots equivalentes de fundación superficial (Gazetas/Novak)."""
         from ..ssi_springs import SsiSpringsInput, calculate_ssi_springs
@@ -186,7 +186,7 @@ def create_router() -> Any:
         dynamic_coef: float = Field(0.15, ge=0.0, le=0.5)
         n_points: int = Field(50, ge=10, le=200)
 
-    @router.post("/api/geo/monopile")
+    @router.post("/api/geo/monopile", summary="Análisis lateral y capacidad de monopilotes offshore bajo viento y oleaje")
     def monopile_dynamic_py(payload: MonopileDynamicPyPayload):
         """Curvas P-y dinámicas y cíclicas para monopilotes eólicos de gran diámetro."""
         from ..piles.dynamic_py import MonopileDynamicPyInput, calculate_monopile_dynamic_py
@@ -209,7 +209,7 @@ def create_router() -> Any:
         unsupported_convergence_ratio: float = Field(0.30, ge=0.0, le=0.9)
         n_points: int = Field(50, ge=10, le=200)
 
-    @router.post("/api/geo/tunnel-winkler")
+    @router.post("/api/geo/tunnel-winkler", summary="Interacción suelo-estructura en revestimientos de túnel (modelo Winkler)")
     def tunnel_winkler(payload: TunnelWinklerPayload):
         """Análisis de convergencia-confinamiento y resortes Winkler elastoplásticos para túneles."""
         from ..tunnels import TunnelWinklerInput, calculate_tunnel_confinement
