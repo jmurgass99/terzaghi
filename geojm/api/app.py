@@ -19,7 +19,7 @@ def create_router() -> Any:
 
     router = APIRouter()
 
-    @router.get("/health")
+    @router.get("/api/geo/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
 

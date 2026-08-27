@@ -13,7 +13,7 @@ def client():
 
 
 def test_health(client):
-    assert client.get("/health").status_code == 200
+    assert client.get("/api/geo/health").status_code == 200
 
 
 def test_py_matlock(client):
