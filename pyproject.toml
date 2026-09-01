@@ -17,6 +17,9 @@ include = ["geojm*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "characterization: fija la salida ACTUAL de la implementacion, no un valor publicado",
+]
 
 [tool.uv.sources]
 jmstructural-common = { workspace = true }
