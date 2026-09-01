@@ -32,6 +32,39 @@ class GazetasResult:
     G_soil_MPa: float
 
 
+@dataclass(frozen=True)
+class GazetasSupportResult:
+    """Rigideces de apoyo elástico SSI Gazetas con unidades y deformaciones directas."""
+    Kz_kN_per_m: float
+    Kx_kN_per_m: float
+    Ky_kN_per_m: float
+    Krx_kNm_per_rad: float
+    Kry_kNm_per_rad: float
+    Krz_kNm_per_rad: float
+    G_soil_MPa: float
+    units: dict[str, str]
+    vertical_settlement_m: float
+    vertical_settlement_mm: float
+    rotation_x_rad: float
+    rotation_y_rad: float
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "Kz_kN_per_m": self.Kz_kN_per_m,
+            "Kx_kN_per_m": self.Kx_kN_per_m,
+            "Ky_kN_per_m": self.Ky_kN_per_m,
+            "Krx_kNm_per_rad": self.Krx_kNm_per_rad,
+            "Kry_kNm_per_rad": self.Kry_kNm_per_rad,
+            "Krz_kNm_per_rad": self.Krz_kNm_per_rad,
+            "G_soil_MPa": self.G_soil_MPa,
+            "units": self.units,
+            "vertical_settlement_m": self.vertical_settlement_m,
+            "vertical_settlement_mm": self.vertical_settlement_mm,
+            "rotation_x_rad": self.rotation_x_rad,
+            "rotation_y_rad": self.rotation_y_rad,
+        }
+
+
 def evaluate_gazetas(inp: GazetasInput) -> GazetasResult:
     if inp.L_m < inp.B_m:
         raise ValueError("L_m debe ser ≥ B_m (L mayor lado)")
@@ -67,4 +100,67 @@ def evaluate_gazetas(inp: GazetasInput) -> GazetasResult:
     )
 
 
-__all__ = ["GazetasInput", "GazetasResult", "evaluate_gazetas"]
+def gazetas_elastic_support_and_settlement(
+    L_m: float,
+    B_m: float,
+    P_kN: float = 0.0,
+    Mx_kNm: float = 0.0,
+    My_kNm: float = 0.0,
+    Vs_m_per_s: float = 200.0,
+    rho_soil_kg_m3: float = 1900.0,
+    nu_soil: float = 0.35,
+) -> GazetasSupportResult:
+    """Calcula las 6 rigideces SSI de Gazetas (1991) con unidades declaradas y asentamiento elástico exacto P/Kz."""
+    res = evaluate_gazetas(
+        GazetasInput(
+            L_m=L_m,
+            B_m=B_m,
+            Vs_m_per_s=Vs_m_per_s,
+            rho_soil_kg_m3=rho_soil_kg_m3,
+            nu_soil=nu_soil,
+        )
+    )
+
+    # Deformaciones elásticas bajo solicitación dada: δ = F / K
+    w_settlement_m = (P_kN / res.Kz_kN_per_m) if res.Kz_kN_per_m > 0 else 0.0
+    rot_x_rad = (Mx_kNm / res.Krx_kNm_per_rad) if res.Krx_kNm_per_rad > 0 else 0.0
+    rot_y_rad = (My_kNm / res.Kry_kNm_per_rad) if res.Kry_kNm_per_rad > 0 else 0.0
+
+    units = {
+        "Kz": "kN/m",
+        "Kx": "kN/m",
+        "Ky": "kN/m",
+        "Krx": "kNm/rad",
+        "Kry": "kNm/rad",
+        "Krz": "kNm/rad",
+        "G_soil": "MPa",
+        "vertical_settlement": "m",
+        "vertical_settlement_mm": "mm",
+        "rotation_x": "rad",
+        "rotation_y": "rad",
+    }
+
+    return GazetasSupportResult(
+        Kz_kN_per_m=res.Kz_kN_per_m,
+        Kx_kN_per_m=res.Kx_kN_per_m,
+        Ky_kN_per_m=res.Ky_kN_per_m,
+        Krx_kNm_per_rad=res.Krx_kNm_per_rad,
+        Kry_kNm_per_rad=res.Kry_kNm_per_rad,
+        Krz_kNm_per_rad=res.Krz_kNm_per_rad,
+        G_soil_MPa=res.G_soil_MPa,
+        units=units,
+        vertical_settlement_m=w_settlement_m,
+        vertical_settlement_mm=w_settlement_m * 1000.0,
+        rotation_x_rad=rot_x_rad,
+        rotation_y_rad=rot_y_rad,
+    )
+
+
+__all__ = [
+    "GazetasInput",
+    "GazetasResult",
+    "GazetasSupportResult",
+    "evaluate_gazetas",
+    "gazetas_elastic_support_and_settlement",
+]
+

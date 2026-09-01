@@ -150,6 +150,27 @@ def create_router() -> Any:
             "G_soil_MPa": r.G_soil_MPa,
         }
 
+    class GazetasSupportPayload(BaseModel):
+        L_m: float = Field(..., gt=0)
+        B_m: float = Field(..., gt=0)
+        P_kN: float = Field(0.0, ge=0)
+        Mx_kNm: float = Field(0.0)
+        My_kNm: float = Field(0.0)
+        Vs_m_per_s: float = Field(200.0, gt=0)
+        rho_soil_kg_m3: float = Field(1900.0, gt=0)
+        nu_soil: float = Field(0.35, ge=0, le=0.5)
+
+    @router.post("/api/geo/gazetas-support", summary="Rigideces SSI de Gazetas con unidades y deformaciones elásticas P/k")
+    def gazetas_support(payload: GazetasSupportPayload):
+        """Apoyos elásticos Gazetas de 6 GDL con cálculo directo de asentamiento y giro."""
+        from ..gazetas_springs import gazetas_elastic_support_and_settlement
+        try:
+            r = gazetas_elastic_support_and_settlement(**payload.model_dump())
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        return r.to_dict()
+
+
     class SsiSpringsPayload(BaseModel):
         L_m: float = Field(..., gt=0)
         B_m: float = Field(..., gt=0)

@@ -100,4 +100,10 @@ def evaluate_liquefaction(inp: LiquefactionInput,
     )
 
 
-__all__ = ["LiquefactionInput", "LiquefactionResult", "evaluate_liquefaction"]
+__all__ = [
+    "LiquefactionInput",
+    "LiquefactionResult",
+    "evaluate_liquefaction",
+    "evaluate_spt_profile_liquefaction",
+]
+

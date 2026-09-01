@@ -149,4 +149,91 @@ def evaluate_bi2014(inp: BoulangerIdrissInput) -> BoulangerIdrissResult:
     )
 
 
-__all__ = ["BoulangerIdrissInput", "BoulangerIdrissResult", "evaluate_bi2014"]
+@dataclass(frozen=True)
+
+class ProfileLiquefactionResult:
+    evaluated: bool
+    status: str
+    layers: list[dict[str, Any]]
+    min_FS: float | None
+    has_liquefiable_stratum: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "evaluated": self.evaluated,
+            "status": self.status,
+            "layers": self.layers,
+            "min_FS": self.min_FS,
+            "has_liquefiable_stratum": self.has_liquefiable_stratum,
+        }
+
+
+def evaluate_spt_profile_liquefaction(
+    spt_layers: list[dict[str, Any]] | None,
+    a_max_g: float = 0.30,
+    Mw: float = 7.5,
+) -> ProfileLiquefactionResult:
+    """Evalúa licuación multicapa con Boulanger & Idriss (2014) o reporta no evaluación si no hay datos SPT."""
+    if not spt_layers:
+        return ProfileLiquefactionResult(
+            evaluated=False,
+            status="NO EVALUADO (sin datos de SPT)",
+            layers=[],
+            min_FS=None,
+            has_liquefiable_stratum=False,
+        )
+
+    layer_results: list[dict[str, Any]] = []
+    min_fs = float("inf")
+    any_liq = False
+
+    for ly in spt_layers:
+        depth = float(ly["depth_m"])
+        sv = float(ly["sigma_v_kPa"])
+        sveff = float(ly["sigma_v_eff_kPa"])
+        n160 = float(ly.get("N1_60cs", ly.get("N1_60_cs", 15.0)))
+
+        res = evaluate_bi2014(
+            BoulangerIdrissInput(
+                depth_m=depth,
+                sigma_v_kPa=sv,
+                sigma_v_eff_kPa=sveff,
+                N1_60cs=n160,
+                a_max_g=a_max_g,
+                Mw=Mw,
+            )
+        )
+        layer_results.append({
+            "depth_m": depth,
+            "N1_60cs": n160,
+            "sigma_v_kPa": sv,
+            "sigma_v_eff_kPa": sveff,
+            "CSR": res.CSR,
+            "CRR": res.CRR,
+            "MSF": res.MSF,
+            "K_sigma": res.K_sigma,
+            "FS": res.FS,
+            "is_liquefiable": res.is_liquefiable,
+        })
+        if res.FS < min_fs:
+            min_fs = res.FS
+        if res.is_liquefiable:
+            any_liq = True
+
+    return ProfileLiquefactionResult(
+        evaluated=True,
+        status="EVALUADO (Boulanger & Idriss 2014)",
+        layers=layer_results,
+        min_FS=min_fs if layer_results else None,
+        has_liquefiable_stratum=any_liq,
+    )
+
+
+__all__ = [
+    "BoulangerIdrissInput",
+    "BoulangerIdrissResult",
+    "ProfileLiquefactionResult",
+    "evaluate_bi2014",
+    "evaluate_spt_profile_liquefaction",
+]
+
