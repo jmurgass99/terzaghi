@@ -157,6 +157,12 @@ class ProfileLiquefactionResult:
     layers: list[dict[str, Any]]
     min_FS: float | None
     has_liquefiable_stratum: bool
+    n_layers_not_evaluated: int = 0
+    """Capas descartadas por no traer N1_60cs.
+
+    Si es > 0, ``has_liquefiable_stratum=False`` significa "ninguna de las capas
+    EVALUADAS lo es", no que el perfil este libre de licuacion.
+    """
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -165,6 +171,7 @@ class ProfileLiquefactionResult:
             "layers": self.layers,
             "min_FS": self.min_FS,
             "has_liquefiable_stratum": self.has_liquefiable_stratum,
+            "n_layers_not_evaluated": self.n_layers_not_evaluated,
         }
 
 
@@ -187,11 +194,40 @@ def evaluate_spt_profile_liquefaction(
     min_fs = float("inf")
     any_liq = False
 
+    n_sin_ensayo = 0
+
     for ly in spt_layers:
         depth = float(ly["depth_m"])
         sv = float(ly["sigma_v_kPa"])
         sveff = float(ly["sigma_v_eff_kPa"])
-        n160 = float(ly.get("N1_60cs", ly.get("N1_60_cs", 15.0)))
+
+        # DEFECTO CORREGIDO: aqui habia un `.get(..., 15.0)`. Si una capa no
+        # traia el ensayo SPT se INVENTABA N1_60cs = 15.0 y se calculaba un
+        # factor de seguridad sobre un dato fabricado. Y 15 no es un valor
+        # neutro: cae justo en la frontera licuable / no licuable, asi que el
+        # resultado salia plausible en cualquier direccion. Ademas era el UNICO
+        # parametro que se rellenaba en silencio —depth_m, sigma_v_kPa y
+        # sigma_v_eff_kPa si lanzaban KeyError— y precisamente el que gobierna
+        # la resistencia. Todo ello en el modulo cuyo titular es el reporte
+        # defensivo "NO EVALUADO (sin datos de SPT)".
+        raw_n160 = ly.get("N1_60cs", ly.get("N1_60_cs"))
+        if raw_n160 is None:
+            n_sin_ensayo += 1
+            layer_results.append({
+                "depth_m": depth,
+                "N1_60cs": None,
+                "sigma_v_kPa": sv,
+                "sigma_v_eff_kPa": sveff,
+                "CSR": None,
+                "CRR": None,
+                "MSF": None,
+                "K_sigma": None,
+                "FS": None,
+                "is_liquefiable": None,
+                "status": "NO EVALUADA (sin N1_60cs)",
+            })
+            continue
+        n160 = float(raw_n160)
 
         res = evaluate_bi2014(
             BoulangerIdrissInput(
@@ -214,18 +250,44 @@ def evaluate_spt_profile_liquefaction(
             "K_sigma": res.K_sigma,
             "FS": res.FS,
             "is_liquefiable": res.is_liquefiable,
+            "status": "EVALUADA",
         })
         if res.FS < min_fs:
             min_fs = res.FS
         if res.is_liquefiable:
             any_liq = True
 
+    n_evaluadas = len(layer_results) - n_sin_ensayo
+
+    if n_evaluadas == 0:
+        return ProfileLiquefactionResult(
+            evaluated=False,
+            status=(
+                f"NO EVALUADO (ninguna de las {n_sin_ensayo} capas trae N1_60cs)"
+            ),
+            layers=layer_results,
+            min_FS=None,
+            has_liquefiable_stratum=False,
+            n_layers_not_evaluated=n_sin_ensayo,
+        )
+
+    if n_sin_ensayo:
+        status = (
+            f"EVALUADO PARCIALMENTE (Boulanger & Idriss 2014): "
+            f"{n_evaluadas} de {len(layer_results)} capas. "
+            f"{n_sin_ensayo} sin N1_60cs y por tanto SIN evaluar — la ausencia "
+            f"de estrato licuable NO esta establecida para el perfil completo."
+        )
+    else:
+        status = "EVALUADO (Boulanger & Idriss 2014)"
+
     return ProfileLiquefactionResult(
         evaluated=True,
-        status="EVALUADO (Boulanger & Idriss 2014)",
+        status=status,
         layers=layer_results,
-        min_FS=min_fs if layer_results else None,
+        min_FS=min_fs,
         has_liquefiable_stratum=any_liq,
+        n_layers_not_evaluated=n_sin_ensayo,
     )
 
 
