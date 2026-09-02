@@ -34,16 +34,28 @@ def test_ssi_springs_calculus():
     # 3. a0 = omega * (B/2) / Vs = 50.265 * 1.5 / 180 = 0.4188
     assert res.a0_dimensionless == pytest.approx(res.omega_rad_s * 1.5 / 180.0)
     
-    # 4. Rigideces estáticas y dinámicas deben ser no-cero y lógicas
+    # 4. Rigideces estáticas y dinámicas
     assert res.Kz_static_kN_m > 0.0
     assert res.Kz_dynamic_kN_m > 0.0
     assert res.Kx_static_kN_m > 0.0
     assert res.Kx_dynamic_kN_m > 0.0
+    assert res.Ky_static_kN_m > 0.0
+    assert res.Ky_dynamic_kN_m > 0.0
+    assert res.Krx_static_kNm_rad > 0.0
+    assert res.Krx_dynamic_kNm_rad > 0.0
+    assert res.Kry_static_kNm_rad > 0.0
+    assert res.Kry_dynamic_kNm_rad > 0.0
+    assert res.Krz_static_kNm_rad > 0.0
+    assert res.Krz_dynamic_kNm_rad > 0.0
     
     # 5. Amortiguamiento por radiación y total
     assert res.Cz_radiation_kNs_m > 0.0
     assert res.Cz_total_kNs_m > res.Cz_radiation_kNs_m
     assert res.Cx_total_kNs_m > res.Cx_radiation_kNs_m
+    assert res.Cy_total_kNs_m > res.Cy_radiation_kNs_m
+    assert res.Crx_total_kNms_rad > res.Crx_radiation_kNms_rad
+    assert res.Cry_total_kNms_rad > res.Cry_radiation_kNms_rad
+    assert res.Crz_total_kNms_rad > res.Crz_radiation_kNms_rad
 
 
 def test_ssi_springs_invalid_dimensions():

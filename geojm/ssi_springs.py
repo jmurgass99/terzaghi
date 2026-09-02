@@ -10,6 +10,8 @@ import math
 from typing import Optional
 from pydantic import BaseModel, Field
 
+from .gazetas_springs import GazetasInput, evaluate_gazetas
+
 
 # ---------------------------------------------------------------------------
 # Schemas de Entrada Pydantic v2
@@ -100,36 +102,28 @@ def calculate_ssi_springs(inp: SsiSpringsInput) -> SsiSpringsOutput:
     VLa = (3.4 * inp.Vs_m_per_s) / (math.pi * (1.0 - nu))
     
     # Inercias de área de la fundación
-    Ix = (B * (L ** 3)) / 12.0  # Rocking alrededor del eje corto X
-    Iy = (L * (B ** 3)) / 12.0  # Rocking alrededor del eje largo Y
-    J_polar = Ix + Iy           # Torsión
-    
-    # 2. Rigideces estáticas de Gazetas (1991)
-    # Vertical Z
-    Kz_static = ((G_Pa * L) / (1.0 - nu)) * (0.73 + 1.54 * ((B / L) ** 0.75))
-    
-    # Horizontal X (dirección paralela al eje largo L)
-    Kx_static = ((G_Pa * L) / (2.0 - nu)) * (2.0 + 2.5 * ((B / L) ** 0.85))
-    
-    # Horizontal Y (dirección paralela al eje corto B)
-    Ky_static = Kx_static - ((G_Pa * L) / (0.75 - nu)) * (0.1 * (1.0 - B / L))
-    
-    # Rotación Rocking alrededor de X (Krx)
-    Krx_static = ((G_Pa * (Iy ** 0.75)) / (1.0 - nu)) * (3.0 * ((L / B) ** 0.15))
-    
-    # Rotación Rocking alrededor de Y (Kry)
-    Kry_static = ((G_Pa * (Ix ** 0.75)) / (1.0 - nu)) * (3.73 * ((L / B) ** 2.4) + 0.27)
-    
-    # Torsión Z (Krz)
-    Krz_static = G_Pa * (((B**2 + L**2) * B * L) ** 0.75) * 4.25
-    
-    # Convertir rigideces estáticas a kN/m y kN-m/rad
-    Kz_s_kN = Kz_static / 1000.0
-    Kx_s_kN = Kx_static / 1000.0
-    Ky_s_kN = Ky_static / 1000.0
-    Krx_s_kNm = Krx_static / 1000.0
-    Kry_s_kNm = Kry_static / 1000.0
-    Krz_s_kNm = Krz_static / 1000.0
+    # Ix: inercia respecto al eje longitudinal X (ancho B) -> rocking alrededor de X
+    Ix = (L * (B ** 3)) / 12.0
+    # Iy: inercia respecto al eje transversal Y (longitud L) -> rocking alrededor de Y
+    Iy = (B * (L ** 3)) / 12.0
+    J_polar = Ix + Iy  # Torsión
+
+    # 2. Rigideces estáticas de Gazetas (1991) desde módulo unificado canónico
+    gaz_res = evaluate_gazetas(
+        GazetasInput(
+            L_m=L,
+            B_m=B,
+            Vs_m_per_s=inp.Vs_m_per_s,
+            rho_soil_kg_m3=inp.rho_soil_kg_m3,
+            nu_soil=inp.nu_soil,
+        )
+    )
+    Kz_s_kN = gaz_res.Kz_kN_per_m
+    Kx_s_kN = gaz_res.Kx_kN_per_m
+    Ky_s_kN = gaz_res.Ky_kN_per_m
+    Krx_s_kNm = gaz_res.Krx_kNm_per_rad
+    Kry_s_kNm = gaz_res.Kry_kNm_per_rad
+    Krz_s_kNm = gaz_res.Krz_kNm_per_rad
     
     # 3. Factores modificadores de rigidez dinámica k(omega)
     # Según Gazetas, para cimientos superficiales rectangulares:
@@ -163,11 +157,11 @@ def calculate_ssi_springs(inp: SsiSpringsInput) -> SsiSpringsOutput:
     Cx_rad = inp.rho_soil_kg_m3 * inp.Vs_m_per_s * A_footing
     Cy_rad = Cx_rad
     
-    # Rocking X (alrededor del eje largo): Crx = rho * VLa * Iy
-    Crx_rad = inp.rho_soil_kg_m3 * VLa * Iy
+    # Rocking X (alrededor del eje longitudinal X): Crx = rho * VLa * Ix
+    Crx_rad = inp.rho_soil_kg_m3 * VLa * Ix
     
-    # Rocking Y (alrededor del eje corto): Cry = rho * VLa * Ix
-    Cry_rad = inp.rho_soil_kg_m3 * VLa * Ix
+    # Rocking Y (alrededor del eje transversal Y): Cry = rho * VLa * Iy
+    Cry_rad = inp.rho_soil_kg_m3 * VLa * Iy
     
     # Torsión Z: Crz = rho * Vs * J_polar
     Crz_rad = inp.rho_soil_kg_m3 * inp.Vs_m_per_s * J_polar

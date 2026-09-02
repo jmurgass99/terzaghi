@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import pi
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,17 @@ class GazetasSupportResult:
         }
 
 
+#: Razon Krx/Kry que los ajustes PUBLICADOS de Gazetas (1991) dan para una
+#: zapata CUADRADA (L = B): (2.4 + 0.5)/3.0 = 0.9667.
+#:
+#: La fisica exige 1.0 —una zapata cuadrada sobre semiespacio elastico tiene la
+#: misma rigidez de balanceo en los dos ejes—, y los ajustes empiricos no lo
+#: reproducen. Ese 3.3 % es la dispersion de la FUENTE. Se documenta en vez de
+#: corregirse: alterar los coeficientes publicados para cerrar el hueco seria
+#: inventar normativa, y sustituirlos por un promedio dejaria de ser Gazetas.
+RATIO_ROCKING_CUADRADA = (2.4 + 0.5) / 3.0
+
+
 def evaluate_gazetas(inp: GazetasInput) -> GazetasResult:
     if inp.L_m < inp.B_m:
         raise ValueError("L_m debe ser ≥ B_m (L mayor lado)")
@@ -72,26 +84,51 @@ def evaluate_gazetas(inp: GazetasInput) -> GazetasResult:
     G = inp.rho_soil_kg_m3 * inp.Vs_m_per_s ** 2 / 1e6  # MPa
     nu = inp.nu_soil
 
-    # Fórmulas Gazetas (1991) Table 4 — zapata rectangular L > B
+    # Fórmulas Gazetas (1991) Table 1 & NIST GCR 12-917-21 Table 2-1 — zapata rectangular L >= B
     # Kz vertical
     Kz = (G * 1e6 * L) / (1 - nu) * (0.73 + 1.54 * (B / L) ** 0.75) / 1000  # kN/m
     # Kx (parallel to L)
-    Kx = (G * 1e6 * L) / (2 - nu) * (2 + 2.5 * (B / L) ** 0.85) / 1000
-    # Ky (perpendicular)
+    Kx = (G * 1e6 * L) / (2 - nu) * (2.0 + 2.50 * (B / L) ** 0.85) / 1000
+    # Ky (perpendicular, parallel to B)
     Ky = Kx - (G * 1e6 * L) / (0.75 - nu) * (
-        0.1 * (1 - B / L)
+        0.20 * (1.0 - B / L)
     ) / 1000
 
-    # Rotacionales (rocking about long axis y short axis)
-    Iy = L * B ** 3 / 12   # rocking about long axis = "Y" → moment about y
-    Ix = B * L ** 3 / 12
-    Krx = (G * 1e6 * Iy ** 0.75) / (1 - nu) * (
+    # Inercias de contacto del área de la zapata:
+    # Ix: inercia respecto al eje longitudinal x (ancho B) -> flexión/balanceo alrededor de x
+    Ix = L * B ** 3 / 12.0
+    # Iy: inercia respecto al eje transversal y (longitud L) -> flexión/balanceo alrededor de y
+    Iy = B * L ** 3 / 12.0
+    J = Ix + Iy
+
+    # Rotacionales (Gazetas 1991 Table 1 / NIST GCR 12-917-21 Table 2-1)
+    #
+    # LOS DOS AJUSTES SON CURVAS EMPIRICAS INDEPENDIENTES y no reproducen
+    # exactamente la simetria fisica. En zapata cuadrada (L = B) la fisica exige
+    # Krx = Kry, pero los factores PUBLICADOS valen 2.90 y 3.00: un 3.3 % de
+    # discrepancia que es el error de ajuste de LA FUENTE, no un defecto de esta
+    # implementacion. Ver RATIO_ROCKING_CUADRADA.
+    #
+    # DEFECTO CORREGIDO: una version anterior sustituia el coeficiente publicado
+    # 0.50 por un 0.41, anadia un termino corrector -0.19 inexistente en la
+    # fuente, y remataba con una rama `if L == B: Kry = Krx`. Los tres cambios
+    # existian para que ambas ramas dieran exactamente 2.81 en L = B y asi
+    # satisfacer un test de simetria estricta. Es fabricar coeficientes
+    # normativos para pasar un test —el mismo patron que los 0.20/0.15
+    # inventados bajo la cita de NSR-10 A.3.6.4.2— con el agravante de que el
+    # docstring del test lo justificaba invocando la simetria del semiespacio
+    # elastico, que es cierta pero no es lo que los ajustes de Gazetas dan.
+    # Se restauran los coeficientes publicados y la discrepancia se DECLARA.
+    Krx = (G * 1e6 * Ix ** 0.75) / (1 - nu) * (
+        (L / B) ** 0.25 * (2.4 + 0.5 * (B / L))
+    ) / 1000
+
+    Kry = (G * 1e6 * Iy ** 0.75) / (1 - nu) * (
         3.0 * (L / B) ** 0.15
     ) / 1000
-    Kry = (G * 1e6 * Ix ** 0.75) / (1 - nu) * (
-        3.73 * (L / B) ** 2.4 + 0.27
-    ) / 1000
-    Krz = (G * 1e6) * ((B ** 2 + L ** 2) * B * L) ** 0.75 * 4.25 / 1000
+
+    # Krz: Torsión alrededor del eje vertical z
+    Krz = (3.5 * G * 1e6 * J ** 0.75) * ((B / L) ** 0.40) / 1000
 
     return GazetasResult(
         Kz_kN_per_m=Kz, Kx_kN_per_m=Kx, Ky_kN_per_m=Ky,
