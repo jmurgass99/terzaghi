@@ -1,19 +1,18 @@
 """
 Correcciones de capacidad portante por carga inclinada y excéntrica.
 
-Complementa ``bearing_capacity.evaluate_bearing`` (que cubre Nc/Nq/Nγ + forma)
-con las verificaciones que la norma exige para cargas reales no centradas:
+ESTADO: MÓDULO SUPERADO / SHIM DE RETROCOMPATIBILIDAD.
+La formulación canónica de capacidad portante de cimentación superficial del monorepo
+es ``foundationdesignjm.analysis.bearing_capacity`` (EN 1997-1:2004 Anexo D), que integra
+tanto el área efectiva de Meyerhof como los factores de inclinación de Vesic / EC7
+directamente dentro de la ecuación analítica global.
 
-  - Excentricidad (Meyerhof): área efectiva B' = B − 2·e_B, L' = L − 2·e_L.
-  - Inclinación (Vesic, EN 1997 Anexo D): factores i_c, i_q, i_γ por carga
-    horizontal H combinada con vertical V.
-
-Referencias: Vesic (1975); EN 1997-1 Anexo D; Das, *Principles of Foundation
-Engineering* §4.
+Este módulo se conserva como shim para no romper consumidores legacy.
 """
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 
 
@@ -28,7 +27,17 @@ class EffectiveArea:
 
 
 def effective_dimensions(B_m: float, L_m: float, e_B_m: float = 0.0, e_L_m: float = 0.0) -> EffectiveArea:
-    """Área efectiva de Meyerhof: B' = B−2e_B, L' = L−2e_L (recorta la excentricidad)."""
+    """Área efectiva de Meyerhof: B' = B−2e_B, L' = L−2e_L (recorta la excentricidad).
+
+    DEPRECADO: Usar directamente foundationdesignjm.analysis.bearing_capacity.
+    """
+    warnings.warn(
+        "geojm.bearing_inclination.effective_dimensions está deprecada. "
+        "La canónica foundationdesignjm.analysis.bearing_capacity incorpora "
+        "las dimensiones efectivas e_x, e_y automáticamente.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     B_eff = max(B_m - 2.0 * abs(e_B_m), 0.0)
     L_eff = max(L_m - 2.0 * abs(e_L_m), 0.0)
     return EffectiveArea(B_eff, L_eff)
@@ -38,9 +47,15 @@ def inclination_factors(V_kN: float, H_kN: float, c_kPa: float, phi_deg: float,
                         B_eff_m: float, L_eff_m: float) -> tuple[float, float, float]:
     """Factores de inclinación i_c, i_q, i_γ (Vesic / EN 1997 Anexo D).
 
-    Carga vertical V (>0) y horizontal H. m es el exponente direccional. Devuelve
-    (i_c, i_q, i_γ). Para H=0 todos valen 1.0.
+    DEPRECADO: Usar directamente foundationdesignjm.analysis.bearing_capacity.
     """
+    warnings.warn(
+        "geojm.bearing_inclination.inclination_factors está deprecada. "
+        "La canónica foundationdesignjm.analysis.bearing_capacity calcula "
+        "los factores de inclinación EN 1997-1 Anexo D directamente.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     if H_kN <= 0 or V_kN <= 0:
         return 1.0, 1.0, 1.0
     phi = math.radians(phi_deg)
@@ -63,3 +78,4 @@ def inclination_factors(V_kN: float, H_kN: float, c_kPa: float, phi_deg: float,
 
 
 __all__ = ["EffectiveArea", "effective_dimensions", "inclination_factors"]
+
