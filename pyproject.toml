@@ -7,7 +7,15 @@ name = "geojm"
 version = "0.1.0"
 description = "Geotecnia y fundaciones — P-y curves, SSI, Mander"
 requires-python = ">=3.11"
-dependencies = ["numpy>=1.26", "forallpeople>=2.6", "jmstructural-common"]
+dependencies = [
+    "numpy>=1.26",
+    "forallpeople>=2.6",
+    "jmstructural-common",
+    # `geojm.bearing_capacity` importa foundationdesignjm A NIVEL DE MODULO
+    # (delega la capacidad portante en la canonica). Funcionaba sin declararlo
+    # solo porque el venv del workspace instala todo; instalado suelto rompia.
+    "foundationdesignjm",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
@@ -23,3 +31,4 @@ markers = [
 
 [tool.uv.sources]
 jmstructural-common = { workspace = true }
+foundationdesignjm = { workspace = true }
