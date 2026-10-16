@@ -29,6 +29,28 @@ class FastSAPPySpringsConfig:
 def build_py_curve(node: PySpringNode, n: int = 12, epsilon_50: float = 0.01) -> list[tuple[float, float]]:
     """Construye una curva P-y con n puntos (Matlock-clay o Reese-sand)."""
     pts = []
+    # PRESENCIA de los datos de resistencia (B49, §8.30). Antes la rama de arena
+    # hacia `(node.phi_deg or 30.0)`: un nodo SIN su ni phi --los defaults del
+    # dataclass-- y un phi = 0.0 medido salian con la resistencia de una arena
+    # de 30 grados (Pu = 48.6 kN/m a z = 3 m, D = 0.6 m), y esa curva se escribia
+    # como muelle en SAP. La ruta publicada del hermano, /api/geo/py/reese
+    # (geojm/api/app.py:41), ya exige phi con gt=0: aqui se aplica la misma regla.
+    if node.su_kPa is None and node.phi_deg is None:
+        raise ValueError(
+            f"PySpringNode z={node.z_m} m: sin su_kPa ni phi_deg; no se fabrica "
+            "una resistencia (antes: arena de 30 grados)"
+        )
+    if node.su_kPa is None and not (node.phi_deg > 0.0):
+        raise ValueError(
+            f"PySpringNode z={node.z_m} m: phi_deg = {node.phi_deg} sin su_kPa. Un "
+            "suelo sin friccion es cohesivo y le falta su; no es una arena de 30 grados"
+        )
+    if node.su_kPa is not None and not (node.su_kPa > 0.0):
+        # Antes: ZeroDivisionError en `gamma*z/su` sin nombrar el nodo.
+        raise ValueError(
+            f"PySpringNode z={node.z_m} m: su_kPa = {node.su_kPa} no define una "
+            "curva de Matlock (hace falta su > 0)"
+        )
     if node.su_kPa is not None:
         Pu = min(9 * node.su_kPa * node.D_m,
                  (3 + node.gamma_kN_m3 * node.z_m / node.su_kPa + 0.5 * node.z_m / node.D_m) * node.su_kPa * node.D_m)
@@ -39,7 +61,12 @@ def build_py_curve(node: PySpringNode, n: int = 12, epsilon_50: float = 0.01) ->
             Pi = 0.5 * Pu * ratio
             pts.append((yi, min(Pi, Pu)))
     else:
-        Pu = 1.5 * node.gamma_kN_m3 * node.z_m * (node.phi_deg or 30.0) / 30.0 * node.D_m
+        # OJO: esta formula NO es un modelo P-y reconocido (JmWorkbench/README.md:276
+        # la llama «inventada»). Sustituirla por `py_reese_sand` --el modelo del
+        # propio paquete, documentado para muelles SAP/ETABS-- cambia cada muelle
+        # de arena ~2x (phi 32: 51.8 -> 95.9 kN/m): es una decision abierta
+        # (§8.30-bis en NIGHT_SHIFT_ERRORS.md), no parte de este arreglo.
+        Pu = 1.5 * node.gamma_kN_m3 * node.z_m * node.phi_deg / 30.0 * node.D_m
         for i in range(n):
             yi = (i / (n - 1)) * 0.05 * node.D_m
             Pi = Pu * (1 - (1 - yi / (0.05 * node.D_m + 1e-9)) ** 2) if yi > 0 else 0.0
