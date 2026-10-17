@@ -92,13 +92,14 @@ def calculate_tunnel_confinement(inp: TunnelWinklerInput) -> TunnelWinklerOutput
     # Rango de presiones internas
     pressures_Pa = [P0_Pa - i * (P0_Pa / (inp.n_points - 1)) for i in range(inp.n_points)]
     
+    c_cot_phi = c_Pa / math.tan(phi_rad) if inp.phi_deg > 0.0 else 0.0
+
     for Pi in pressures_Pa:
         if Pi >= Pcr_Pa:
             # Fase Elástica
             u = ((1.0 + inp.nu_soil) / E_Pa) * (P0_Pa - Pi) * inp.R0_m
         else:
             # Fase Plástica
-            c_cot_phi = c_Pa / math.tan(phi_rad) if inp.phi_deg > 0.0 else 0.0
             if inp.phi_deg > 0.0 and (Pi + c_cot_phi) > 0.0:
                 base_rp = (2.0 / (kp + 1.0)) * (P0_Pa + c_cot_phi) / (Pi + c_cot_phi)
                 exponent = 1.0 / (kp - 1.0) if abs(kp - 1.0) > 1e-5 else 1.0
@@ -114,7 +115,7 @@ def calculate_tunnel_confinement(inp: TunnelWinklerInput) -> TunnelWinklerOutput
     max_conv_unsupported_mm = u_vals_mm[-1]
     
     # 3. Radio plástico máximo a presión interna cero
-    if inp.phi_deg > 0.0 and c_Pa > 0.0:
+    if Pcr_Pa > 0.0 and inp.phi_deg > 0.0 and c_Pa > 0.0:
         base_rp_zero = (2.0 / (kp + 1.0)) * (P0_Pa + c_cot_phi) / (c_cot_phi)
         exponent_zero = 1.0 / (kp - 1.0) if abs(kp - 1.0) > 1e-5 else 1.0
         Rp_zero = inp.R0_m * (base_rp_zero ** exponent_zero)
@@ -139,7 +140,9 @@ def calculate_tunnel_confinement(inp: TunnelWinklerInput) -> TunnelWinklerOutput
         for j in range(1, len(u_vals_mm)):
             if u_vals_mm[j-1] <= u_target <= u_vals_mm[j]:
                 denom_interp = u_vals_mm[j] - u_vals_mm[j-1]
-                ratio = (u_target - u_vals_mm[j-1]) / denom_interp if denom_interp > 1e-9 else 0.0
+                if denom_interp <= 1e-9:
+                    return pi_vals[j-1]
+                ratio = (u_target - u_vals_mm[j-1]) / denom_interp
                 return pi_vals[j-1] + ratio * (pi_vals[j] - pi_vals[j-1])
         return 0.0
 
