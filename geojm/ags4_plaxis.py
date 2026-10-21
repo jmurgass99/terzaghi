@@ -140,6 +140,7 @@ def parse_ags4_text(content: str) -> Ags4Project:
             top, base = 0.0, 2.0
         code = g.get("GEOL_LEG", "SOIL")
         desc = g.get("GEOL_DESC", "Stratum")
+        stype = "clay" if "CLAY" in f"{code} {desc}".upper() else "sand"
 
         if stype == "clay":
             gamma = 17.5
