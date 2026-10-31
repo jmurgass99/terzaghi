@@ -3,7 +3,7 @@ Correcciones de capacidad portante por carga inclinada y excéntrica.
 
 ESTADO: MÓDULO SUPERADO / SHIM DE RETROCOMPATIBILIDAD.
 La formulación canónica de capacidad portante de cimentación superficial del monorepo
-es ``foundationdesignjm.analysis.bearing_capacity`` (EN 1997-1:2004 Anexo D), que integra
+es ``foundationcalc.analysis.bearing_capacity`` (EN 1997-1:2004 Anexo D), que integra
 tanto el área efectiva de Meyerhof como los factores de inclinación de Vesic / EC7
 directamente dentro de la ecuación analítica global.
 
@@ -29,11 +29,11 @@ class EffectiveArea:
 def effective_dimensions(B_m: float, L_m: float, e_B_m: float = 0.0, e_L_m: float = 0.0) -> EffectiveArea:
     """Área efectiva de Meyerhof: B' = B−2e_B, L' = L−2e_L (recorta la excentricidad).
 
-    DEPRECADO: Usar directamente foundationdesignjm.analysis.bearing_capacity.
+    DEPRECADO: Usar directamente foundationcalc.analysis.bearing_capacity.
     """
     warnings.warn(
-        "geojm.bearing_inclination.effective_dimensions está deprecada. "
-        "La canónica foundationdesignjm.analysis.bearing_capacity incorpora "
+        "terzaghi.bearing_inclination.effective_dimensions está deprecada. "
+        "La canónica foundationcalc.analysis.bearing_capacity incorpora "
         "las dimensiones efectivas e_x, e_y automáticamente.",
         DeprecationWarning,
         stacklevel=2,
@@ -47,11 +47,11 @@ def inclination_factors(V_kN: float, H_kN: float, c_kPa: float, phi_deg: float,
                         B_eff_m: float, L_eff_m: float) -> tuple[float, float, float]:
     """Factores de inclinación i_c, i_q, i_γ (Vesic / EN 1997 Anexo D).
 
-    DEPRECADO: Usar directamente foundationdesignjm.analysis.bearing_capacity.
+    DEPRECADO: Usar directamente foundationcalc.analysis.bearing_capacity.
     """
     warnings.warn(
-        "geojm.bearing_inclination.inclination_factors está deprecada. "
-        "La canónica foundationdesignjm.analysis.bearing_capacity calcula "
+        "terzaghi.bearing_inclination.inclination_factors está deprecada. "
+        "La canónica foundationcalc.analysis.bearing_capacity calcula "
         "los factores de inclinación EN 1997-1 Anexo D directamente.",
         DeprecationWarning,
         stacklevel=2,

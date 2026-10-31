@@ -1,6 +1,6 @@
 """GOLDEN — factores de capacidad portante y q_ult de zapata corrida.
 
-Modulo bajo prueba: ``geojm.bearing_capacity``.
+Modulo bajo prueba: ``terzaghi.bearing_capacity``.
 
 FUENTES (soluciones cerradas publicadas, derivadas inline abajo, y sus tablas):
 
@@ -63,11 +63,11 @@ import math
 
 import pytest
 
-from geojm.bearing_capacity import (
+from terzaghi.bearing_capacity import (
     BearingCapacityInput,
     evaluate_bearing,
 )
-from geojm.bearing_capacity import _bearing_factors
+from terzaghi.bearing_capacity import _bearing_factors
 
 
 # (phi_deg, Nc, Nq, N_gamma Vesic) — tabla publicada, 2 decimales

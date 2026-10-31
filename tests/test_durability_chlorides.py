@@ -9,7 +9,7 @@ import math
 
 import pytest
 
-from geojm.durability.chlorides import ChlorideInput, concentration, time_to_initiation
+from terzaghi.durability.chlorides import ChlorideInput, concentration, time_to_initiation
 
 
 @pytest.fixture

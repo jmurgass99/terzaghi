@@ -6,7 +6,7 @@ Medido (z = 3 m, D = 0.6 m): PySpringNode() sin su ni phi -> Pu = 48.6 kN/m, y
 PySpringNode(phi_deg=0.0) -> 48.6 kN/m. Los dos IDENTICOS a phi = 30. Y esa
 curva se escribia como muelle MultiLinearPlastic en SAP.
 
-La ruta publicada del hermano (/api/geo/py/reese, geojm/api/app.py:41) ya exige
+La ruta publicada del hermano (/api/geo/py/reese, terzaghi/api/app.py:41) ya exige
 phi con gt=0: se aplica la misma regla.
 
 NO SE DECIDE AQUI: la formula de arena en si no es un modelo P-y reconocido.
@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import pytest
 
-from geojm.integration.fastsap_pysprings import (FastSAPPySpringsConfig,
+from terzaghi.integration.fastsap_pysprings import (FastSAPPySpringsConfig,
                                                   PySpringNode, build_py_curve,
                                                   export_to_fastsap)
 

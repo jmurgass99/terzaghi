@@ -2,7 +2,7 @@
 """Muro de gaviones EN 1997-1 — validado contra el ejemplo de M. Hanif."""
 import pytest
 
-from geojm.gabion_wall import (
+from terzaghi.gabion_wall import (
     GabionLayer,
     GabionSoil,
     GabionWall,

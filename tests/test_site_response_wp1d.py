@@ -7,7 +7,7 @@ Amplificacion esperada: ~2-3x (con 5% amortiguamiento).
 import numpy as np
 import pytest
 
-from geojm.site_response.wave_propagation_1d import (
+from terzaghi.site_response.wave_propagation_1d import (
     SoilLayer1D,
     SiteResponseResult,
     propagate_1d,

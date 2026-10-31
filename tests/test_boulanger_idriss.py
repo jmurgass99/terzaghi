@@ -5,7 +5,7 @@ FS esperado ~0.8-1.0 (arena moderadamente suelta, sismo fuerte).
 """
 import pytest
 
-from geojm.liquefaction.boulanger_idriss import (
+from terzaghi.liquefaction.boulanger_idriss import (
     BoulangerIdrissInput,
     BoulangerIdrissResult,
     evaluate_bi2014,

@@ -1,4 +1,4 @@
-"""Bridge GeoJm -> FastSAP: wire P-y curves to SAP nonlinear link springs.
+"""Bridge Terzaghi -> FastSAP: wire P-y curves to SAP nonlinear link springs.
 
 Dado un perfil de suelo discretizado en nodos, genera curvas P-y y produce
 los datos de spring no-lineales para SAP (link MultiLinearPlastic).
@@ -34,7 +34,7 @@ def build_py_curve(node: PySpringNode, n: int = 12, epsilon_50: float = 0.01) ->
     # dataclass-- y un phi = 0.0 medido salian con la resistencia de una arena
     # de 30 grados (Pu = 48.6 kN/m a z = 3 m, D = 0.6 m), y esa curva se escribia
     # como muelle en SAP. La ruta publicada del hermano, /api/geo/py/reese
-    # (geojm/api/app.py:41), ya exige phi con gt=0: aqui se aplica la misma regla.
+    # (terzaghi/api/app.py:41), ya exige phi con gt=0: aqui se aplica la misma regla.
     if node.su_kPa is None and node.phi_deg is None:
         raise ValueError(
             f"PySpringNode z={node.z_m} m: sin su_kPa ni phi_deg; no se fabrica "

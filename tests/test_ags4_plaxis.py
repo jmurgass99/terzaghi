@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from geojm.ags4_plaxis import (
+from terzaghi.ags4_plaxis import (
     Ags4Project,
     generate_plaxis_python_script,
     parse_ags4_text,

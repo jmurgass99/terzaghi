@@ -1,7 +1,7 @@
 """Tests para memoria de calculo pile group lateral — GJ-005."""
 import pytest
 
-from geojm.memos.pile_group_lateral import (
+from terzaghi.memos.pile_group_lateral import (
     PileGroupLateralInput,
     PileGroupLateralResult,
     render_pile_group_memo,

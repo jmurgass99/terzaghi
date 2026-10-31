@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Golden tests — empuje activo de Coulomb y empuje sismico Mononobe-Okabe.
 
-Ancla las funciones de ``geojm.gabion_wall_safety`` al ejemplo numerico resuelto
+Ancla las funciones de ``terzaghi.gabion_wall_safety`` al ejemplo numerico resuelto
 de la ficha maestra **W00704** (UPC, Prof. A. Drougkas, "Seismic design of
 foundations - Retaining wall"), que reporta todos los valores intermedios.
 
@@ -28,7 +28,7 @@ import math
 
 import pytest
 
-from geojm.gabion_wall_safety import (
+from terzaghi.gabion_wall_safety import (
     active_thrust_coulomb,
     mononobe_okabe_seismic_coefficient,
 )

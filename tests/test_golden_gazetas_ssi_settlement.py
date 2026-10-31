@@ -65,13 +65,13 @@ from __future__ import annotations
 
 import math
 import pytest
-from geojm.gazetas_springs import (
+from terzaghi.gazetas_springs import (
     RATIO_ROCKING_CUADRADA,
     GazetasInput,
     evaluate_gazetas,
     gazetas_elastic_support_and_settlement,
 )
-from geojm.ssi_springs import (
+from terzaghi.ssi_springs import (
     SsiSpringsInput,
     calculate_ssi_springs,
 )

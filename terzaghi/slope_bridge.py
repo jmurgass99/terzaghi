@@ -1,4 +1,4 @@
-"""Bridge GeoJm → SlopeStabilityJm.
+"""Bridge Terzaghi → SlopeStabilityJm.
 
 Convierte parámetros geotécnicos a inputs de los métodos Bishop/Janbu
 o Newmark para evaluar estabilidad sísmica de taludes.
@@ -11,7 +11,7 @@ from typing import Any
 
 def call_newmark(accelerogram_g, dt_s: float, a_y_g: float) -> Any:
     try:
-        from slopestabilityjm.newmark import NewmarkInput, evaluate_newmark
+        from slipcircle.newmark import NewmarkInput, evaluate_newmark
     except ImportError:
         warnings.warn("SlopeStabilityJm no instalado", RuntimeWarning)
         return None

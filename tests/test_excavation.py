@@ -1,7 +1,7 @@
 """Tests Terzaghi-Peck excavation stability."""
 import pytest
 
-from geojm.excavation import ExcavationInput, check_excavation
+from terzaghi.excavation import ExcavationInput, check_excavation
 
 
 def test_excavacion_segura():

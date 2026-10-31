@@ -1,4 +1,4 @@
-"""FastAPI app para GeoJm."""
+"""FastAPI app para Terzaghi."""
 from typing import Any, Literal
 
 
@@ -15,7 +15,7 @@ def create_router() -> Any:
         py_matlock_soft_clay,
         py_reese_sand,
     )
-    from jmstructural_common.units import convert
+    from terzaghi._common.units import convert
 
     router = APIRouter()
 
@@ -247,6 +247,6 @@ def create_app() -> Any:
     """App FastAPI standalone."""
     from fastapi import FastAPI
 
-    app = FastAPI(title="GeoJm API", version="0.1.0")
+    app = FastAPI(title="Terzaghi API", version="0.1.0")
     app.include_router(create_router())
     return app

@@ -1,6 +1,6 @@
 """GOLDEN — CRR de Boulanger & Idriss (2014) para SPT.
 
-Modulo bajo prueba: ``geojm.liquefaction.boulanger_idriss``.
+Modulo bajo prueba: ``terzaghi.liquefaction.boulanger_idriss``.
 
 FUENTE (ecuaciones publicadas, citadas por numero y reproducidas):
     Boulanger, R. W. & Idriss, I. M. (2014), "CPT and SPT Based Liquefaction
@@ -65,11 +65,11 @@ import math
 
 import pytest
 
-from geojm.liquefaction.boulanger_idriss import (
+from terzaghi.liquefaction.boulanger_idriss import (
     BoulangerIdrissInput,
     evaluate_bi2014,
 )
-from geojm.liquefaction.boulanger_idriss import (
+from terzaghi.liquefaction.boulanger_idriss import (
     _crr_m75,
     _k_sigma_bi2014,
     _msf_bi2014,

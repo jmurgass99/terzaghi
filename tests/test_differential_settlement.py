@@ -1,7 +1,7 @@
 """Tests para asentamientos diferenciales — GJ-002."""
 import pytest
 
-from geojm.audit.differential_settlement import (
+from terzaghi.audit.differential_settlement import (
     check_differential_settlement,
     Finding,
 )

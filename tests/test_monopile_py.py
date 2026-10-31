@@ -1,12 +1,12 @@
-"""Tests unitarios para curvas P-y dinámicas y cíclicas de monopilotes en GeoJm."""
+"""Tests unitarios para curvas P-y dinámicas y cíclicas de monopilotes en Terzaghi."""
 
 import pytest
 from fastapi.testclient import TestClient
-from geojm.piles.dynamic_py import (
+from terzaghi.piles.dynamic_py import (
     calculate_monopile_dynamic_py,
     MonopileDynamicPyInput,
 )
-from geojm.api.app import create_app
+from terzaghi.api.app import create_app
 
 client = TestClient(create_app())
 

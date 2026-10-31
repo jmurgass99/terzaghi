@@ -1,10 +1,10 @@
 """Tests correlaciones + Gazetas."""
 import pytest
 
-from geojm.correlations import (
+from terzaghi.correlations import (
     Es_from_N, N60_corrected, N_from_qc, Su_from_qc, phi_from_N, qc_from_N,
 )
-from geojm.gazetas_springs import GazetasInput, evaluate_gazetas
+from terzaghi.gazetas_springs import GazetasInput, evaluate_gazetas
 
 
 class TestCorrelations:

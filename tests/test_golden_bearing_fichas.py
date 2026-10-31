@@ -26,14 +26,14 @@ ERRATAS documentadas de las fichas (regla de oro de la campaña):
      los valores impresos son VESIĆ 2(Nq+1)tanφ (p.ej. 30.22 a 32°); Annex D
      da 2(Nq−1)tanφ = 27.71 y Hansen 1970 da 1.5(Nq−1)tanφ = 20.78. Nq y Nc
      sí son los clásicos comunes a todos. Se ancla a los valores impresos
-     (= Vesić, método 'vesic' de GeoJm).
+     (= Vesić, método 'vesic' de Terzaghi).
   2. W00675 GT1 imprime sq = 1+sin32° = "1.527"; lo correcto es 1.530
      (sin32° = 0.5299). Con sq exacto, qult = 1338 kPa (ficha imprime 1334,
      Δ=0.3%); Rk = 4830 kN (ficha 4815); Rd = 3450 kN (ficha 3439). Se ancla
      al recálculo con tolerancia que cubre la ficha.
   3. W00672 imprime la fórmula "Nγ = 2(Nq−1)tanφ (Hansen)" pero su valor de
      ejemplo Nγ(32°)=22.02 corresponde a MEYERHOF (Nq−1)tan(1.4φ)=22.020.
-     Se ancla el valor al método 'meyerhof' de GeoJm y se documenta el
+     Se ancla el valor al método 'meyerhof' de Terzaghi y se documenta el
      desajuste fórmula↔valor.
   4. W00672 dice "qult ≈ 680 kPa" para su ejemplo (φ=32°, B=2, Df=1): NO es
      reproducible con sus propios datos y factores (la composición da ~814
@@ -43,8 +43,8 @@ import math
 
 import pytest
 
-from geojm.bearing_capacity import BearingCapacityInput, evaluate_bearing
-from geojm.bearing_inclination import effective_dimensions
+from terzaghi.bearing_capacity import BearingCapacityInput, evaluate_bearing
+from terzaghi.bearing_inclination import effective_dimensions
 
 # Tabla W00675 (impresa) y recálculo a mano (Vesić). Columnas: Nq, Nc, Ngamma.
 TABLA_W00675 = {
@@ -71,7 +71,7 @@ def _factors(phi: float, method: str = "vesic"):
 
 
 class TestTablaFactoresW00675:
-    """Tabla Nq/Nc/Nγ de W00675 == método 'vesic' de GeoJm (5 filas)."""
+    """Tabla Nq/Nc/Nγ de W00675 == método 'vesic' de Terzaghi (5 filas)."""
 
     @pytest.mark.parametrize("phi", sorted(TABLA_W00675))
     def test_fila_tabla(self, phi):
@@ -127,8 +127,8 @@ class TestZapataCuadradaDA2W00675:
     La ficha compone qult = q·Nq·sq + 0.5·γ·B·Nγ·sγ con sq=1+sinφ (cuadrada),
     sγ=0.7, B=2.0 en el término Nγ y área con B'=1.9 m (procedimiento de la
     ficha; Annex D usaría B' también en el término Nγ — documentado).
-    GeoJm no expone esos factores de forma en evaluate_bearing (usa Meyerhof
-    simplificado), así que el golden ancla los FACTORES de GeoJm dentro de la
+    Terzaghi no expone esos factores de forma en evaluate_bearing (usa Meyerhof
+    simplificado), así que el golden ancla los FACTORES de Terzaghi dentro de la
     composición transcrita de la ficha.
     """
 
@@ -150,7 +150,7 @@ class TestZapataCuadradaDA2W00675:
         assert Rd == pytest.approx(3450.0, abs=6.0)        # recalc (ficha: 3439)
 
     def test_gamma_Rv_14_en_evaluate_bearing_EU(self):
-        # El factor DA2 γR;v=1.4 de W00675/W00672 es el que aplica GeoJm en EU.
+        # El factor DA2 γR;v=1.4 de W00675/W00672 es el que aplica Terzaghi en EU.
         r = evaluate_bearing(BearingCapacityInput(
             B_m=2.0, L_m=2.0, D_f_m=1.5, phi_deg=32.0, gamma_kN_m3=18.0,
             method="vesic"), code="EU")
@@ -162,7 +162,7 @@ class TestZapataCorridaGwtW00675:
     γ'=10 bajo NF; qult = c·Nc + q·Nq + 0.5·γ'·B·Nγ = 822.6 kPa (ficha: 822).
 
     evaluate_bearing usa un único γ (no admite γ' distinto bajo la base), por
-    eso el golden compone el qult con los factores de GeoJm y la fórmula
+    eso el golden compone el qult con los factores de Terzaghi y la fórmula
     transcrita de la ficha (corrida: factores de forma = 1).
     """
 

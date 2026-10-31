@@ -28,7 +28,7 @@ se ancla al recálculo y se acepta la ficha con tolerancia.
 """
 import pytest
 
-from geojm.consolidation import (
+from terzaghi.consolidation import (
     Fn_barron,
     Fn_hansbo,
     Th_from_Uh,

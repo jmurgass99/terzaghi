@@ -3,7 +3,7 @@ Capacidad portante de zapatas.
 
 ESTADO: este módulo está DEPRECADO como calculadora. La implementación
 CANÓNICA de capacidad portante de cimentación superficial del monorepo es
-``foundationdesignjm.analysis.bearing_capacity``; aquí se DELEGA en ella a
+``foundationcalc.analysis.bearing_capacity``; aquí se DELEGA en ella a
 través de :func:`evaluate_bearing_ec7`.
 
 Por qué la canónica es esa y no ésta (medido, no opinado)
@@ -13,7 +13,7 @@ geotechnical design according to Eurocode 7", UPC MEEC; transcrito en
 ``packages/FoundationDesignJm/docs/theory/04_eurocode7_examples.md``), que
 publica los NUEVE valores intermedios de una zapata de 2.5 × 1.5 m:
 
-    foundationdesignjm.analysis   903.47 kPa   →   −0.004 %  (publicado 903.5)
+    foundationcalc.analysis   903.47 kPa   →   −0.004 %  (publicado 903.5)
     evaluate_bearing (vesic)      927.13 kPa   →   +2.62 %
     evaluate_bearing (brinch_h.)  748.10 kPa   →  −17.20 %
 
@@ -30,7 +30,7 @@ q_ult un **+41.1 %** por encima de la canónica.
 
 :func:`evaluate_bearing` se conserva con sus valores INTACTOS (sólo emite
 ``DeprecationWarning``) para no romper a los llamadores existentes. El módulo
-``geojm.bearing_inclination`` queda igualmente superado por la canónica, que
+``terzaghi.bearing_inclination`` queda igualmente superado por la canónica, que
 sí cablea excentricidad e inclinación dentro de la misma ecuación.
 
 Modelos que implementa el camino legacy:
@@ -55,22 +55,22 @@ from typing import Any, Literal
 
 # --- Delegación a la implementación CANÓNICA ------------------------------
 # Import a nivel de módulo: se comprobó que NO crea ciclo (FoundationDesignJm
-# sólo importa geojm de forma perezosa, dentro de funciones, en
-# ``foundationdesignjm/integration/geojm_bridge.py``, y no lo declara como
+# sólo importa terzaghi de forma perezosa, dentro de funciones, en
+# ``foundationcalc/integration/terzaghi_bridge.py``, y no lo declara como
 # dependencia).
 # Si el import fallara NO se silencia: se guarda la excepción y se relanza en
 # la llamada, para no convertir una dependencia ausente en un cero silencioso.
 try:  # pragma: no cover - depende del entorno instalado
-    from foundationdesignjm.analysis.bearing_capacity import (
+    from ._foundation.bearing_capacity import (
         BearingCapacityFormula as _CanonicalFormula,
     )
-    from foundationdesignjm.analysis.bearing_capacity import (
+    from ._foundation.bearing_capacity import (
         drained_bearing_capacity as _canonical_drained_bearing_capacity,
     )
-    from foundationdesignjm.core.geometry import (
+    from ._foundation.geometry import (
         RectangularFoundation as _CanonicalFoundation,
     )
-    from foundationdesignjm.core.soil import SoilLayer as _CanonicalSoilLayer
+    from ._foundation.soil import SoilLayer as _CanonicalSoilLayer
 
     _CANONICAL_IMPORT_ERROR: ImportError | None = None
 except ImportError as _exc:  # pragma: no cover - depende del entorno instalado
@@ -147,14 +147,14 @@ def evaluate_bearing_ec7(
 ) -> Any:
     """Capacidad portante drenada — DELEGA en la implementación canónica.
 
-    Puerta de GeoJm hacia
-    ``foundationdesignjm.analysis.bearing_capacity.drained_bearing_capacity``
+    Puerta de Terzaghi hacia
+    ``foundationcalc.analysis.bearing_capacity.drained_bearing_capacity``
     (EN 1997-1:2004 Anexo D). Devuelve **el objeto de la canónica sin
     envolver**: no se reimplementa ni se copia ninguna fórmula aquí, de modo
-    que cualquier corrección en la canónica llega a GeoJm sin tocar este
+    que cualquier corrección en la canónica llega a Terzaghi sin tocar este
     fichero.
 
-    Lo único que aporta esta función es la **conversión de unidades**: GeoJm
+    Lo único que aporta esta función es la **conversión de unidades**: Terzaghi
     habla en metros y la canónica en MILÍMETROS. Ese es exactamente el error
     silencioso (factor ~1000, sin excepción) que se evita centralizándolo.
 
@@ -195,7 +195,7 @@ def evaluate_bearing_ec7(
         gamma_Rv, gamma_phi, gamma_c: factores parciales del Design Approach.
 
     Returns:
-        ``foundationdesignjm.analysis.bearing_capacity.BearingCapacityResult``
+        ``foundationcalc.analysis.bearing_capacity.BearingCapacityResult``
         — con ``.q_ult``, los tres términos, N_c/N_q/N_γ, factores de forma e
         inclinación y las dimensiones efectivas.
 
@@ -205,10 +205,10 @@ def evaluate_bearing_ec7(
     """
     if _canonical_drained_bearing_capacity is None:
         raise ImportError(
-            "geojm.bearing_capacity.evaluate_bearing_ec7 delega en la "
+            "terzaghi.bearing_capacity.evaluate_bearing_ec7 delega en la "
             "implementación canónica de FoundationDesignJm, que no se pudo "
             f"importar: {_CANONICAL_IMPORT_ERROR}. Instala el paquete "
-            "'foundationdesignjm' del workspace."
+            "'foundationcalc' del workspace."
         ) from _CANONICAL_IMPORT_ERROR
 
     return _canonical_drained_bearing_capacity(
@@ -248,11 +248,11 @@ def evaluate_bearing(inp: BearingCapacityInput, code: str = "EU"
     medición que motivó la deprecación.
     """
     warnings.warn(
-        "geojm.bearing_capacity.evaluate_bearing está deprecada: sus factores "
+        "terzaghi.bearing_capacity.evaluate_bearing está deprecada: sus factores "
         "de forma no corresponden a ningún juego publicado y es ciega a la "
         "excentricidad y a la inclinación de carga (hasta +41 % del lado "
-        "INSEGURO). Usa geojm.bearing_capacity.evaluate_bearing_ec7, que "
-        "delega en la canónica foundationdesignjm.analysis.bearing_capacity "
+        "INSEGURO). Usa terzaghi.bearing_capacity.evaluate_bearing_ec7, que "
+        "delega en la canónica foundationcalc.analysis.bearing_capacity "
         "(EN 1997-1 Anexo D).",
         DeprecationWarning,
         stacklevel=2,

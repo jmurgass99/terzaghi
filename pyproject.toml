@@ -3,32 +3,44 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "geojm"
-version = "0.1.0"
-description = "Geotecnia y fundaciones — P-y curves, SSI, Mander"
+name = "terzaghi"
+version = "1.0.0"
+description = "Geotechnical analysis: bearing capacity (Terzaghi, Meyerhof, Vesic, Brinch Hansen), p-y curves and pile capacity, Gazetas SSI springs, consolidation, liquefaction (Boulanger-Idriss), site response, excavations, gabion walls, tunnels and AGS4 import."
+readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "numpy>=1.26",
-    "forallpeople>=2.6",
-    "jmstructural-common",
-    # `geojm.bearing_capacity` importa foundationdesignjm A NIVEL DE MODULO
-    # (delega la capacidad portante en la canonica). Funcionaba sin declararlo
-    # solo porque el venv del workspace instala todo; instalado suelto rompia.
-    "foundationdesignjm",
+license = { text = "MIT" }
+authors = [{ name = "Jesús Murgas" }]
+keywords = ["geotechnical-engineering", "bearing-capacity", "p-y-curves", "piles", "liquefaction", "soil-structure-interaction", "consolidation", "eurocode-7"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
 ]
+dependencies = ["numpy>=1.26", "pydantic>=2.0", "forallpeople>=2.6"]
 
 [project.optional-dependencies]
-test = ["pytest>=8"]
+api = ["fastapi>=0.110", "uvicorn>=0.29", "httpx>=0.27"]
+memos = ["handcalcs>=1.6"]
+test = ["pytest>=8", "pytest-timeout>=2.2"]
+
+[project.urls]
+Homepage = "https://github.com/jmurgass99/terzaghi"
+Repository = "https://github.com/jmurgass99/terzaghi"
+Issues = "https://github.com/jmurgass99/terzaghi/issues"
 
 [tool.setuptools.packages.find]
-include = ["geojm*"]
+include = ["terzaghi*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "characterization: fija la salida ACTUAL de la implementacion, no un valor publicado",
+    "slow: tests lentos",
+    "integration: integración entre módulos",
+    "api: endpoints REST",
+    "safety_critical: validados contra valores publicados",
 ]
-
-[tool.uv.sources]
-jmstructural-common = { workspace = true }
-foundationdesignjm = { workspace = true }

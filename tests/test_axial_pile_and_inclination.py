@@ -3,13 +3,13 @@ import math
 
 import pytest
 
-from geojm.piles.axial_capacity import (
+from terzaghi.piles.axial_capacity import (
     Pile,
     SoilLayer,
     api_alpha,
     axial_capacity,
 )
-from geojm.bearing_inclination import effective_dimensions, inclination_factors
+from terzaghi.bearing_inclination import effective_dimensions, inclination_factors
 
 
 class TestAlpha:

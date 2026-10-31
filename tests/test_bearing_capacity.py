@@ -1,7 +1,7 @@
 """Tests bearing capacity multi-código."""
 import pytest
 
-from geojm.bearing_capacity import BearingCapacityInput, evaluate_bearing
+from terzaghi.bearing_capacity import BearingCapacityInput, evaluate_bearing
 
 
 @pytest.fixture

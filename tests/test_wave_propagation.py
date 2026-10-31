@@ -1,7 +1,7 @@
 """Tests propagación de ondas 1D."""
 import numpy as np
 
-from geojm.wave_propagation_1d import SoilLayer, propagate_sh_wave
+from terzaghi.wave_propagation_1d import SoilLayer, propagate_sh_wave
 
 
 def test_perfil_vacio_no_modifica():

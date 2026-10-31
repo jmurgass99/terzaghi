@@ -1,9 +1,9 @@
-"""Tests para IDEAS_20 grupos A/B/C en GeoJm."""
+"""Tests para IDEAS_20 grupos A/B/C en Terzaghi."""
 import pytest
 
 
 def test_van_genuchten_y_bishop():
-    from geojm.unsaturated import (
+    from terzaghi.unsaturated import (
         VanGenuchtenParams, theta_of_psi, chi_bishop, shear_strength_unsat,
     )
     p = VanGenuchtenParams()
@@ -17,13 +17,13 @@ def test_van_genuchten_y_bishop():
 
 
 def test_van_genuchten_decay():
-    from geojm.unsaturated import VanGenuchtenParams, theta_of_psi
+    from terzaghi.unsaturated import VanGenuchtenParams, theta_of_psi
     p = VanGenuchtenParams()
     assert theta_of_psi(0.5, p) > theta_of_psi(5.0, p)
 
 
 def test_mokwa_duncan():
-    from geojm.piles.mokwa_duncan import MokwaDuncanInput, analyze, p_multiplier
+    from terzaghi.piles.mokwa_duncan import MokwaDuncanInput, analyze, p_multiplier
     assert p_multiplier(1) == 1.0
     assert p_multiplier(5) == 0.4
     res = analyze(MokwaDuncanInput(
@@ -35,7 +35,7 @@ def test_mokwa_duncan():
 
 
 def test_estratigrafias_catalogo():
-    from geojm.estratigrafias_catalogo import list_profiles, get_profile
+    from terzaghi.estratigrafias_catalogo import list_profiles, get_profile
     profs = list_profiles()
     assert "santiago_grava" in profs
     assert "bogota_lacustre" in profs
@@ -46,7 +46,7 @@ def test_estratigrafias_catalogo():
 
 
 def test_fastsap_pysprings_dry_run():
-    from geojm.integration.fastsap_pysprings import (
+    from terzaghi.integration.fastsap_pysprings import (
         PySpringNode, FastSAPPySpringsConfig, build_py_curve, export_to_fastsap,
     )
     nodes = (
@@ -63,7 +63,7 @@ def test_fastsap_pysprings_dry_run():
 
 def test_fastsap_pysprings_mock_client():
     from unittest.mock import MagicMock
-    from geojm.integration.fastsap_pysprings import (
+    from terzaghi.integration.fastsap_pysprings import (
         PySpringNode, FastSAPPySpringsConfig, export_to_fastsap,
     )
     mock = MagicMock()

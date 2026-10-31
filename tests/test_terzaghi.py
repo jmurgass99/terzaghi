@@ -1,13 +1,13 @@
-"""Tests para GeoJm — P-y curves, grupo de pilotes, Mander."""
+"""Tests para Terzaghi — P-y curves, grupo de pilotes, Mander."""
 import numpy as np
 import pytest
 
-from geojm.piles import (
+from terzaghi.piles import (
     py_matlock_soft_clay,
     py_reese_sand,
     pile_group_efficiency_lateral,
 )
-from geojm.materials import mander_confined_concrete
+from terzaghi.materials import mander_confined_concrete
 
 
 # ---------------------------------------------------------------------

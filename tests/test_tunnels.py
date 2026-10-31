@@ -1,12 +1,12 @@
-"""Tests unitarios para el análisis de convergencia-confinamiento y resortes Winkler en GeoJm."""
+"""Tests unitarios para el análisis de convergencia-confinamiento y resortes Winkler en Terzaghi."""
 
 import pytest
 from fastapi.testclient import TestClient
-from geojm.tunnels import (
+from terzaghi.tunnels import (
     calculate_tunnel_confinement,
     TunnelWinklerInput,
 )
-from geojm.api.app import create_app
+from terzaghi.api.app import create_app
 
 client = TestClient(create_app())
 

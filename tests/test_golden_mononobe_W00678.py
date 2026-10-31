@@ -9,7 +9,7 @@ Caso: muro H=6 m, γ=18 kN/m³, φ=36°, δ=20°, kh=0.2, kv=0.1; valores de
 diseño EC8 (γφ=1.25): φd = atan(tan36/1.25) = 30.16°, δd = 16.23°.
 
   Rama "+kv" de la ficha: ψ = atan(kh/(1+kv)) = atan(0.2/1.1) = 10.30°.
-  CONVENCIÓN: GeoJm usa ψ = atan(kh/(1−kv)) ⇒ esta rama se obtiene pasando
+  CONVENCIÓN: Terzaghi usa ψ = atan(kh/(1−kv)) ⇒ esta rama se obtiene pasando
   kv = −0.1 (el signo de kv del código es opuesto a la etiqueta de la ficha,
   igual que documenta el test de W00704).
 
@@ -30,7 +30,7 @@ implica K = 154.7/(324·1.1) = 0.434, que SÍ coincide con el recálculo
 """
 import pytest
 
-from geojm.gabion_wall_safety import (
+from terzaghi.gabion_wall_safety import (
     active_thrust_coulomb,
     mononobe_okabe_seismic_coefficient,
 )
@@ -40,7 +40,7 @@ H = 6.0         # m
 PHI_D = 30.16   # deg = atan(tan(36)/1.25)   (γφ=1.25, EC8/EC7 M2)
 DELTA_D = 16.23  # deg = atan(tan(20)/1.25)
 KH = 0.2
-KV_FICHA_MAS = -0.1   # rama "+kv" ficha (ψ=atan(0.2/1.1)) en convención GeoJm
+KV_FICHA_MAS = -0.1   # rama "+kv" ficha (ψ=atan(0.2/1.1)) en convención Terzaghi
 
 
 class TestKaeRamaMasKvW00678:

@@ -6,7 +6,7 @@ Comprobaciones cerradas:
 """
 import pytest
 
-from geojm.durability.carbonation import (
+from terzaghi.durability.carbonation import (
     carbonation_coefficient,
     carbonation_depth,
     time_to_depth,

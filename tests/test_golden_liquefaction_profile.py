@@ -7,7 +7,7 @@ Criterios de entrega:
 from __future__ import annotations
 
 import pytest
-from geojm.liquefaction.boulanger_idriss import (
+from terzaghi.liquefaction.boulanger_idriss import (
     evaluate_spt_profile_liquefaction,
     evaluate_bi2014,
     BoulangerIdrissInput,

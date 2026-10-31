@@ -1,5 +1,5 @@
-"""GeoJm site response — propagacion de ondas 1D."""
-from geojm.site_response.wave_propagation_1d import (
+"""Terzaghi site response — propagacion de ondas 1D."""
+from terzaghi.site_response.wave_propagation_1d import (
     SoilLayer1D,
     SiteResponseResult,
     propagate_1d,

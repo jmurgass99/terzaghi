@@ -2,10 +2,10 @@
 
 El monorepo tenia CINCO implementaciones de la misma pregunta fisica:
 
-  1. ``geojm.bearing_capacity.evaluate_bearing``                  (legacy, aqui)
-  2. ``foundationdesignjm.analysis.bearing_capacity``             <-- CANONICA
+  1. ``terzaghi.bearing_capacity.evaluate_bearing``                  (legacy, aqui)
+  2. ``foundationcalc.analysis.bearing_capacity``             <-- CANONICA
   3. ``fastsap.codes.bearing_capacity.bearing_capacity``
-  4. ``foundationdesignjm.services.bearing.bearing_capacity_multilayer``
+  4. ``foundationcalc.services.bearing.bearing_capacity_multilayer``
   5. ``fastsap.memos.bearing_capacity_memo``
 
 POR QUE LA CANONICA ES LA DE FoundationDesignJm
@@ -16,10 +16,10 @@ INDEPENDIENTE y por cobertura fisica:
 (a) ORACULO PUBLICADO. El ejemplo resuelto W00675 §4.3 (ver FUENTE abajo)
     publica los NUEVE valores intermedios de una zapata rectangular
     (N_q, N_c, N_gamma, s_q, s_c, s_gamma y los tres terminos de q_ult).
-    ``foundationdesignjm.analysis`` los reproduce TODOS con error <= 0.36 %
+    ``foundationcalc.analysis`` los reproduce TODOS con error <= 0.36 %
     y la suma con -0.004 %. Las otras implementaciones, sobre ese MISMO caso
     publicado, dan -17.20 % / -10.38 % / +2.62 % / +15.25 %.
-    Los factores de forma de ``geojm.evaluate_bearing``
+    Los factores de forma de ``terzaghi.evaluate_bearing``
     (s_c = 1+0.2B/L, s_q = 1+0.1B/L, s_gamma = 1-0.1B/L) NO corresponden a
     ningun juego publicado -- ya estaba documentado en la NOTA 2 de
     ``test_golden_bearing_capacity_published.py``. Los de la canonica SI son
@@ -75,22 +75,22 @@ from __future__ import annotations
 
 import pytest
 
-from geojm.bearing_capacity import BearingCapacityInput, evaluate_bearing
+from terzaghi.bearing_capacity import BearingCapacityInput, evaluate_bearing
 
-foundationdesignjm = pytest.importorskip(
-    "foundationdesignjm",
+foundationcalc = pytest.importorskip(
+    "foundationcalc",
     reason="la canonica vive en FoundationDesignJm; sin el paquete no hay que consolidar",
 )
 
-from foundationdesignjm.analysis.bearing_capacity import (  # noqa: E402
+from foundationcalc.analysis.bearing_capacity import (  # noqa: E402
     BearingCapacityFormula,
     drained_bearing_capacity,
     undrained_bearing_capacity,
 )
-from foundationdesignjm.core.geometry import RectangularFoundation  # noqa: E402
-from foundationdesignjm.core.soil import SoilLayer  # noqa: E402
+from foundationcalc.core.geometry import RectangularFoundation  # noqa: E402
+from foundationcalc.core.soil import SoilLayer  # noqa: E402
 
-from geojm.bearing_capacity import evaluate_bearing_ec7  # noqa: E402
+from terzaghi.bearing_capacity import evaluate_bearing_ec7  # noqa: E402
 
 
 # --- Ejemplo publicado W00675 §4.3 DA1-C1 ---------------------------------
@@ -107,7 +107,7 @@ W00675_4_3_DA1C1_PUBLICADO = dict(
 
 def _canonica_directa(B_m, L_m, D_f_m, phi_deg, c_kPa, gamma_kN_m3,
                       e_B_m=0.0, e_L_m=0.0, H_kN=0.0, V_kN=0.0):
-    """Llama a la canonica SIN pasar por GeoJm (oraculo del test de delegacion).
+    """Llama a la canonica SIN pasar por Terzaghi (oraculo del test de delegacion).
 
     OJO: la geometria de FoundationDesignJm va en MILIMETROS.
     """
@@ -151,7 +151,7 @@ LOTE = [
 def test_golden_w00675_pad_footing_da1c1_nueve_valores_publicados() -> None:
     """Los NUEVE valores intermedios publicados del ejemplo W00675 §4.3 DA1-C1.
 
-    Se accede a la canonica A TRAVES de la puerta de GeoJm: si la delegacion
+    Se accede a la canonica A TRAVES de la puerta de Terzaghi: si la delegacion
     se rompiera, este golden cae con ella.
 
     Tolerancias = resolucion de la cifra publicada:
@@ -193,7 +193,7 @@ def test_golden_w00675_suma_de_terminos_es_la_publicada() -> None:
 
 
 def test_golden_w00675_el_legacy_NO_reproduce_el_ejemplo_publicado() -> None:
-    """EVIDENCIA de por que la canonica no es la de GeoJm.
+    """EVIDENCIA de por que la canonica no es la de Terzaghi.
 
     Sobre el MISMO caso publicado, ``evaluate_bearing`` se desvia +2.6 % con
     sus factores de forma no publicados; forzando N_gamma de Brinch Hansen la
@@ -230,32 +230,32 @@ def test_golden_w00675_el_legacy_NO_reproduce_el_ejemplo_publicado() -> None:
 def test_delegacion_preserva_valores_bit_a_bit_sobre_el_lote(tag: str, kw: dict) -> None:
     """``evaluate_bearing_ec7`` devuelve EXACTAMENTE lo que devuelve la canonica.
 
-    Igualdad relativa 1e-12 sobre los tres terminos y sobre q_ult: si GeoJm
+    Igualdad relativa 1e-12 sobre los tres terminos y sobre q_ult: si Terzaghi
     hubiese COPIADO la formula en vez de delegar, el menor detalle de orden de
     operaciones rompe esta tolerancia.
     """
-    via_geojm = evaluate_bearing_ec7(**kw)
+    via_terzaghi = evaluate_bearing_ec7(**kw)
     directo = _canonica_directa(**kw)
 
-    assert via_geojm.q_ult == pytest.approx(directo.q_ult, rel=1e-12)
-    assert via_geojm.q_ult_overburden == pytest.approx(directo.q_ult_overburden, rel=1e-12)
-    assert via_geojm.q_ult_cohesion == pytest.approx(directo.q_ult_cohesion, rel=1e-12)
-    assert via_geojm.q_ult_self_weight == pytest.approx(directo.q_ult_self_weight, rel=1e-12)
-    assert via_geojm.Nq == pytest.approx(directo.Nq, rel=1e-12)
-    assert via_geojm.Nc == pytest.approx(directo.Nc, rel=1e-12)
-    assert via_geojm.Ngamma == pytest.approx(directo.Ngamma, rel=1e-12)
-    assert via_geojm.B_eff == pytest.approx(directo.B_eff, rel=1e-12)
-    assert via_geojm.L_eff == pytest.approx(directo.L_eff, rel=1e-12)
+    assert via_terzaghi.q_ult == pytest.approx(directo.q_ult, rel=1e-12)
+    assert via_terzaghi.q_ult_overburden == pytest.approx(directo.q_ult_overburden, rel=1e-12)
+    assert via_terzaghi.q_ult_cohesion == pytest.approx(directo.q_ult_cohesion, rel=1e-12)
+    assert via_terzaghi.q_ult_self_weight == pytest.approx(directo.q_ult_self_weight, rel=1e-12)
+    assert via_terzaghi.Nq == pytest.approx(directo.Nq, rel=1e-12)
+    assert via_terzaghi.Nc == pytest.approx(directo.Nc, rel=1e-12)
+    assert via_terzaghi.Ngamma == pytest.approx(directo.Ngamma, rel=1e-12)
+    assert via_terzaghi.B_eff == pytest.approx(directo.B_eff, rel=1e-12)
+    assert via_terzaghi.L_eff == pytest.approx(directo.L_eff, rel=1e-12)
 
 
 def test_delegacion_es_delegacion_y_no_copia(monkeypatch: pytest.MonkeyPatch) -> None:
     """PRUEBA ESTRUCTURAL de que se delega: si se parchea la canonica, el
-    resultado que devuelve GeoJm cambia.
+    resultado que devuelve Terzaghi cambia.
 
     Una reimplementacion copiada seguiria devolviendo el valor original y este
     test fallaria. Es la diferencia entre "delegar" y "duplicar".
     """
-    import geojm.bearing_capacity as gbc
+    import terzaghi.bearing_capacity as gbc
 
     centinela = object()
 
@@ -267,7 +267,7 @@ def test_delegacion_es_delegacion_y_no_copia(monkeypatch: pytest.MonkeyPatch) ->
 
 
 def test_delegacion_transporta_excentricidad_e_inclinacion() -> None:
-    """La puerta de GeoJm no se limita a los parametros del legacy: pasa e y H.
+    """La puerta de Terzaghi no se limita a los parametros del legacy: pasa e y H.
 
     Si ``evaluate_bearing_ec7`` ignorara e_B_m/H_kN (como hace el legacy),
     S1, S3, S4 y S5 devolverian el mismo numero. Deben ser cuatro distintos y
@@ -313,9 +313,9 @@ def test_gate_phi_cero_coincide_bit_a_bit_con_la_clausula_no_drenada(
     N_c = pi+2, s_c = 1+0.2 B/L e i_c.
 
     Si la canonica cambiara una de las dos ramas sin la otra, este test lo
-    detecta: es la garantia de que la puerta de GeoJm no esconde el mismo
+    detecta: es la garantia de que la puerta de Terzaghi no esconde el mismo
     patron de "parametro declarado y nunca leido" que se documenta en el
-    informe para ``foundationdesignjm/services/bearing.py``.
+    informe para ``foundationcalc/services/bearing.py``.
     """
     cu = kw["cu_kPa"]
     drenada = evaluate_bearing_ec7(
@@ -422,7 +422,7 @@ def test_evaluate_bearing_legacy_emite_deprecationwarning() -> None:
     assert r.q_ult_kPa == pytest.approx(1372.4301, abs=5e-4)
     mensaje = str(capturado[0].message)
     assert "evaluate_bearing_ec7" in mensaje
-    assert "foundationdesignjm" in mensaje
+    assert "foundationcalc" in mensaje
 
 
 def test_el_legacy_no_cambia_de_valor_al_quedar_deprecado() -> None:

@@ -1,6 +1,6 @@
 """Tests para Skempton-Bjerrum."""
 import pytest
-from geojm.skempton_bjerrum import (
+from terzaghi.skempton_bjerrum import (
     SkemptonBjerrumInput, skempton_bjerrum, differential_settlement_ratio,
 )
 

@@ -1,7 +1,7 @@
 """export_to_fastsap debe reportar fallos OAPI, no tragarlos en silencio."""
 from __future__ import annotations
 
-from geojm.integration.fastsap_pysprings import (
+from terzaghi.integration.fastsap_pysprings import (
     PySpringNode, FastSAPPySpringsConfig, export_to_fastsap,
 )
 

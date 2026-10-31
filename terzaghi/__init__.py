@@ -1,4 +1,4 @@
-"""GeoJm — Geotecnia y fundaciones (P-y curves, grupo de pilotes, SSI, AGS4, PLAXIS)."""
+"""Terzaghi — Geotecnia y fundaciones (P-y curves, grupo de pilotes, SSI, AGS4, PLAXIS)."""
 from __future__ import annotations
 
 from .ags4_plaxis import (

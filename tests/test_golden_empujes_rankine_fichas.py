@@ -40,7 +40,7 @@ ERRATAS documentadas (regla de oro de la campaña):
 """
 import pytest
 
-from geojm.gabion_wall import DESIGN_APPROACHES, Ka_rankine, Kp_rankine
+from terzaghi.gabion_wall import DESIGN_APPROACHES, Ka_rankine, Kp_rankine
 
 # --- Datos W00664 / W00677 ---
 G1, PHI1, H1 = 19.5, 30.0, 6.0        # SOIL1 (superior)

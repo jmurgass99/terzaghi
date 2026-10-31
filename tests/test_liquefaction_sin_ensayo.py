@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import pytest
 
-from geojm.liquefaction.boulanger_idriss import evaluate_spt_profile_liquefaction
+from terzaghi.liquefaction.boulanger_idriss import evaluate_spt_profile_liquefaction
 
 CAPA_OK = {
     "depth_m": 5.0, "sigma_v_kPa": 95.0, "sigma_v_eff_kPa": 65.0,

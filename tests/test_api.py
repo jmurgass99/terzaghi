@@ -1,10 +1,10 @@
-"""Test API GeoJm."""
+"""Test API Terzaghi."""
 import pytest
 
 fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 
-from geojm.api import create_app
+from terzaghi.api import create_app
 
 
 @pytest.fixture

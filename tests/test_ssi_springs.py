@@ -1,12 +1,12 @@
-"""Tests unitarios para el cálculo de resortes dinámicos SSI Gazetas/Novak en GeoJm."""
+"""Tests unitarios para el cálculo de resortes dinámicos SSI Gazetas/Novak en Terzaghi."""
 
 import pytest
 from fastapi.testclient import TestClient
-from geojm.ssi_springs import (
+from terzaghi.ssi_springs import (
     calculate_ssi_springs,
     SsiSpringsInput,
 )
-from geojm.api.app import create_app
+from terzaghi.api.app import create_app
 
 client = TestClient(create_app())
 

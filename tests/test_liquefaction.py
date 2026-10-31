@@ -1,7 +1,7 @@
 """Tests para evaluación de licuación Boulanger-Idriss 2014."""
 import pytest
 
-from geojm.liquefaction import LiquefactionInput, evaluate_liquefaction
+from terzaghi.liquefaction import LiquefactionInput, evaluate_liquefaction
 
 
 class TestBoulangerIdriss:
