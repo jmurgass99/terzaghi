@@ -19,7 +19,7 @@ def test_example_runs_clean(example_path: Path, tmp_path: Path) -> None:
     env["JM_EXAMPLES_OUT_DIR"] = str(tmp_path)
     result = subprocess.run(
         [sys.executable, "-X", "utf8", str(example_path)],
-        capture_output=True, text=True, timeout=100, env=env,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=100, env=env,
         cwd=str(example_path.parent.parent),
     )
     assert result.returncode == 0, f"{example_path.name}\nSTDOUT: {result.stdout[-800:]}\nSTDERR: {result.stderr[-800:]}"
