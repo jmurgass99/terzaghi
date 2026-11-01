@@ -32,19 +32,6 @@ q_ult un **+41.1 %** por encima de la canónica.
 ``DeprecationWarning``) para no romper a los llamadores existentes. El módulo
 ``terzaghi.bearing_inclination`` queda igualmente superado por la canónica, que
 sí cablea excentricidad e inclinación dentro de la misma ecuación.
-
-Modelos que implementa el camino legacy:
-    Terzaghi (1943)        — ver NOTA 1 del golden: NO son los factores de
-                             Terzaghi, coinciden exactamente con Meyerhof
-    Meyerhof (1963)
-    Vesic (1973)
-    Brinch Hansen (1970)
-
-Códigos cubiertos (factores parciales) por el camino legacy:
-    EU/SG: EN 1997-1 §6.5.2 + Annex D (γ_R,v = 1.4 R3, γ_φ = 1.25, γ_c = 1.4)
-    US:    ACI 318 / AASHTO LRFD §10.6 (φ = 0.45 a 0.55)
-    CO:    NSR-10 §H.4.7 (FS ≥ 3 estático, FS ≥ 2 sísmico)
-    AU:    AS 5100.3 / Foundation Code AS 2159 (φ = 0.40–0.70 según método)
 """
 from __future__ import annotations
 
@@ -53,13 +40,6 @@ from dataclasses import dataclass
 from math import exp, pi, radians, tan
 from typing import Any, Literal
 
-# --- Delegación a la implementación CANÓNICA ------------------------------
-# Import a nivel de módulo: se comprobó que NO crea ciclo (FoundationDesignJm
-# sólo importa terzaghi de forma perezosa, dentro de funciones, en
-# ``foundationcalc/integration/terzaghi_bridge.py``, y no lo declara como
-# dependencia).
-# Si el import fallara NO se silencia: se guarda la excepción y se relanza en
-# la llamada, para no convertir una dependencia ausente en un cero silencioso.
 try:  # pragma: no cover - depende del entorno instalado
     from ._foundation.bearing_capacity import (
         BearingCapacityFormula as _CanonicalFormula,
@@ -144,64 +124,15 @@ def evaluate_bearing_ec7(
     gamma_Rv: float = 1.0,
     gamma_phi: float = 1.0,
     gamma_c: float = 1.0,
+    zw_m: float | None = None,
+    gamma_sat_kN_m3: float | None = None,
 ) -> Any:
-    """Capacidad portante drenada — DELEGA en la implementación canónica.
+    """Capacidad portante drenada — DELEGA en la implementación canónica (EN 1997-1 Anexo D).
 
-    Puerta de Terzaghi hacia
-    ``foundationcalc.analysis.bearing_capacity.drained_bearing_capacity``
-    (EN 1997-1:2004 Anexo D). Devuelve **el objeto de la canónica sin
-    envolver**: no se reimplementa ni se copia ninguna fórmula aquí, de modo
-    que cualquier corrección en la canónica llega a Terzaghi sin tocar este
-    fichero.
-
-    Lo único que aporta esta función es la **conversión de unidades**: Terzaghi
-    habla en metros y la canónica en MILÍMETROS. Ese es exactamente el error
-    silencioso (factor ~1000, sin excepción) que se evita centralizándolo.
-
-    ALCANCE — cláusula DRENADA (EN 1997-1 Anexo D.4). Para suelo cohesivo se
-    pasa ``phi_deg=0`` y ``c_kPa=c_u``. Se MIDIÓ que en ese caso esta vía
-    coincide **bit a bit** (diferencia 0.00e+00 kPa) con la cláusula no drenada
-    D.3 de la canónica (``undrained_bearing_capacity``), con y sin
-    excentricidad y con y sin inclinación — lo fija
-    ``test_gate_phi_cero_coincide_bit_a_bit_con_la_clausula_no_drenada``.
-    Coinciden porque en D.4 con φ=0 resulta N_q = 1, s_q = 1 e i_q = 1, de modo
-    que el término de sobrecarga se reduce al ``+ q`` de D.3, y ambos usan el
-    mismo N_c = π+2, s_c = 1+0.2·B/L e i_c.
-
-    NO cubierto por esta puerta: nivel freático (NINGUNA de las cinco
-    implementaciones del monorepo lo cablea dentro de la ecuación; la única
-    con un enganche real de peso sumergido es el parámetro ``gamma_sub`` de
-    ``fastsap.codes.bearing_capacity``, que ningún llamador usa). Si hay NF,
-    pasa ``gamma_kN_m3`` = γ' del estrato de apoyo a sabiendas de que el
-    término de sobrecarga usará ese mismo γ'.
-
-    Frente a :func:`evaluate_bearing`, esta vía SÍ cubre:
-      - área efectiva por excentricidad (Meyerhof): B' = B − 2·e_B, L' = L − 2·e_L
-      - factores de inclinación de carga i_c/i_q/i_γ (Vesic / EN 1997-1 Anexo D)
-      - factores de forma PUBLICADOS del Anexo D
-      - factores parciales de material (γ_φ, γ_c) y de resistencia (γ_R,v)
-
-    Args:
-        B_m, L_m: ancho y largo de la zapata (m).
-        D_f_m: profundidad de desplante (m).
-        phi_deg, c_kPa, gamma_kN_m3: parámetros del suelo (grados, kPa, kN/m³).
-        e_B_m, e_L_m: excentricidades en dirección B y L (m).
-        H_kN, V_kN: cortante horizontal y axil vertical de diseño (kN). Con
-            H_kN > 0 hace falta V_kN > 0: la canónica rechaza la combinación
-            H>0 / V<=0 en vez de aprobarla en silencio.
-        thickness_m: canto de la zapata (m); no interviene en q_ult.
-        formula: autor de N_γ ("chen_ec7", "vesic", "meyerhof",
-            "brinch_hansen"). El defecto es el del Anexo D.
-        gamma_Rv, gamma_phi, gamma_c: factores parciales del Design Approach.
-
-    Returns:
-        ``foundationcalc.analysis.bearing_capacity.BearingCapacityResult``
-        — con ``.q_ult``, los tres términos, N_c/N_q/N_γ, factores de forma e
-        inclinación y las dimensiones efectivas.
-
-    Raises:
-        ImportError: si FoundationDesignJm no está instalado (se relanza el
-            error original en vez de devolver un cero silencioso).
+    Cuando ``zw_m`` (profundidad del nivel freático desde la superficie en metros)
+    se especifica, calcula automáticamente la presión efectiva de sobrecarga ``q'``
+    en el nivel de desplante ``D_f_m`` y el peso específico efectivo ``gamma_eff``
+    en la cuña de rotura bajo la base (entre ``D_f_m`` y ``D_f_m + B_eff``).
     """
     if _canonical_drained_bearing_capacity is None:
         raise ImportError(
@@ -211,26 +142,70 @@ def evaluate_bearing_ec7(
             "'foundationcalc' del workspace."
         ) from _CANONICAL_IMPORT_ERROR
 
+    if zw_m is None:
+        return _canonical_drained_bearing_capacity(
+            foundation=_CanonicalFoundation(
+                length=L_m * 1000.0,            # m -> mm
+                width=B_m * 1000.0,             # m -> mm
+                thickness=thickness_m * 1000.0,  # m -> mm
+                embedment_depth=D_f_m * 1000.0,  # m -> mm
+            ),
+            soil=_CanonicalSoilLayer(
+                thickness=10.0,
+                friction_angle=phi_deg,
+                cohesion=c_kPa,
+                unit_weight=gamma_kN_m3,
+            ),
+            e_x=e_L_m,
+            e_y=e_B_m,
+            H_load=H_kN,
+            V_load=V_kN,
+            gamma_Rv=gamma_Rv,
+            gamma_phi=gamma_phi,
+            gamma_c=gamma_c,
+            formula=_CanonicalFormula(formula),
+        )
+
+    gamma_w = 9.81
+    gamma_sat = gamma_sat_kN_m3 if gamma_sat_kN_m3 is not None else gamma_kN_m3
+    gamma_sub = max(gamma_sat - gamma_w, 1.0)
+
+    # 1. Presión vertical efectiva q' al nivel de desplante D_f_m
+    if zw_m <= 0.0:
+        q_eff = gamma_sub * D_f_m
+    elif zw_m < D_f_m:
+        q_eff = gamma_kN_m3 * zw_m + gamma_sub * (D_f_m - zw_m)
+    else:
+        q_eff = gamma_kN_m3 * D_f_m
+
+    # 2. Peso específico efectivo en la cuña bajo la base (profundidad B' bajo D_f_m)
+    B_eff_est = max(min(B_m - 2.0 * abs(e_B_m), L_m - 2.0 * abs(e_L_m)), 1e-6)
+    if zw_m <= D_f_m:
+        gamma_wedge = gamma_sub
+    elif zw_m < D_f_m + B_eff_est:
+        frac = (zw_m - D_f_m) / B_eff_est
+        gamma_wedge = gamma_sub + frac * (gamma_kN_m3 - gamma_sub)
+    else:
+        gamma_wedge = gamma_kN_m3
+
     return _canonical_drained_bearing_capacity(
         foundation=_CanonicalFoundation(
-            length=L_m * 1000.0,            # m -> mm
-            width=B_m * 1000.0,             # m -> mm
-            thickness=thickness_m * 1000.0,  # m -> mm
-            embedment_depth=D_f_m * 1000.0,  # m -> mm
+            length=L_m * 1000.0,
+            width=B_m * 1000.0,
+            thickness=thickness_m * 1000.0,
+            embedment_depth=D_f_m * 1000.0,
         ),
         soil=_CanonicalSoilLayer(
-            # ``thickness`` NO interviene en q_ult (la canónica sólo usa la capa
-            # de apoyo); se fija a un literal para que no parezca un parámetro
-            # de cálculo. El validador de la canónica exige > 0.
             thickness=10.0,
             friction_angle=phi_deg,
             cohesion=c_kPa,
-            unit_weight=gamma_kN_m3,
+            unit_weight=gamma_wedge,
         ),
-        e_x=e_L_m,   # e_x recorta L (eje largo) en la canónica
-        e_y=e_B_m,   # e_y recorta B (eje corto)
+        e_x=e_L_m,
+        e_y=e_B_m,
         H_load=H_kN,
         V_load=V_kN,
+        overburden_pressure=q_eff,
         gamma_Rv=gamma_Rv,
         gamma_phi=gamma_phi,
         gamma_c=gamma_c,
@@ -240,13 +215,7 @@ def evaluate_bearing_ec7(
 
 def evaluate_bearing(inp: BearingCapacityInput, code: str = "EU"
                       ) -> BearingCapacityResult:
-    """DEPRECADO — usa :func:`evaluate_bearing_ec7`.
-
-    Calcula q_ult y aplica el factor parcial/FS del código, con factores de
-    forma NO publicados y sin excentricidad ni inclinación. Sus valores se
-    mantienen intactos por compatibilidad; ver el docstring del módulo para la
-    medición que motivó la deprecación.
-    """
+    """DEPRECADO — usa :func:`evaluate_bearing_ec7`."""
     warnings.warn(
         "terzaghi.bearing_capacity.evaluate_bearing está deprecada: sus factores "
         "de forma no corresponden a ningún juego publicado y es ciega a la "

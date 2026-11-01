@@ -7,7 +7,7 @@ def create_router() -> Any:
     from fastapi import APIRouter, HTTPException
     from pydantic import BaseModel, Field
 
-    from ..bearing_capacity import BearingCapacityInput, evaluate_bearing
+    from ..bearing_capacity import BearingCapacityInput, evaluate_bearing, evaluate_bearing_ec7
     from ..liquefaction import LiquefactionInput, evaluate_liquefaction
     from ..materials import mander_confined_concrete
     from ..piles import (
@@ -105,24 +105,80 @@ def create_router() -> Any:
         phi_deg: float = Field(..., ge=0, le=50)
         c_kPa: float = Field(0.0, ge=0)
         gamma_kN_m3: float = 18.0
-        method: Literal["terzaghi", "meyerhof", "vesic", "brinch_hansen"] = "vesic"
-        code: Literal["EU", "US"] = "EU"
+        method: Literal["terzaghi", "meyerhof", "vesic", "brinch_hansen", "chen_ec7"] = "vesic"
+        code: Literal["EU", "US", "CO", "AU", "SG"] = "EU"
+        e_B_m: float = Field(0.0, ge=0)
+        e_L_m: float = Field(0.0, ge=0)
+        H_kN: float = Field(0.0, ge=0)
+        V_kN: float = Field(0.0, ge=0)
+        zw_m: float | None = None
+        use_ec7_canonical: bool = True
 
-    @router.post("/api/geo/bearing-capacity", summary="Capacidad de carga admisible y de hundimiento según Brinch Hansen / Meyerhof")
+    @router.post("/api/geo/bearing-capacity", summary="Capacidad de carga admisible y de hundimiento según EN 1997-1 Anexo D / Brinch Hansen / Vesic")
     def bearing_capacity(payload: BearingPayload):
-        """Capacidad portante de zapata superficial (Terzaghi/Meyerhof/Vesic/Hansen)."""
+        """Capacidad portante de zapata superficial vía implementación canónica EN 1997-1 Anexo D."""
         try:
-            data = payload.model_dump()
-            code = data.pop("code")
-            r = evaluate_bearing(BearingCapacityInput(**data), code=code)
+            if not payload.use_ec7_canonical:
+                legacy_method = "meyerhof" if payload.method == "chen_ec7" else payload.method
+                r_leg = evaluate_bearing(
+                    BearingCapacityInput(
+                        B_m=payload.B_m,
+                        L_m=payload.L_m,
+                        D_f_m=payload.D_f_m,
+                        phi_deg=payload.phi_deg,
+                        c_kPa=payload.c_kPa,
+                        gamma_kN_m3=payload.gamma_kN_m3,
+                        method=legacy_method,  # type: ignore[arg-type]
+                    ),
+                    code=payload.code,
+                )
+                return {
+                    "q_ult_kPa": r_leg.q_ult_kPa,
+                    "q_ult_MPa": convert(r_leg.q_ult_kPa, "kPa", "MPa"),
+                    "q_adm_kPa": r_leg.q_adm_kPa,
+                    "Nc": r_leg.Nc, "Nq": r_leg.Nq, "Ngamma": r_leg.Ngamma,
+                    "code_applied": r_leg.code_applied,
+                }
+
+            formula_map = {
+                "terzaghi": "meyerhof",
+                "meyerhof": "meyerhof",
+                "vesic": "vesic",
+                "brinch_hansen": "brinch_hansen",
+                "chen_ec7": "chen_ec7",
+            }
+            r = evaluate_bearing_ec7(
+                B_m=payload.B_m,
+                L_m=payload.L_m,
+                D_f_m=payload.D_f_m,
+                phi_deg=payload.phi_deg,
+                c_kPa=payload.c_kPa,
+                gamma_kN_m3=payload.gamma_kN_m3,
+                e_B_m=payload.e_B_m,
+                e_L_m=payload.e_L_m,
+                H_kN=payload.H_kN,
+                V_kN=payload.V_kN,
+                formula=formula_map[payload.method],
+                zw_m=payload.zw_m,
+            )
+            if payload.code in ("EU", "SG"):
+                q_adm = r.q_ult / 1.40
+            elif payload.code == "US":
+                q_adm = 0.50 * r.q_ult
+            elif payload.code == "CO":
+                q_adm = r.q_ult / 3.0
+            else:
+                q_adm = 0.45 * r.q_ult
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
         return {
-            "q_ult_kPa": r.q_ult_kPa,
-            "q_ult_MPa": convert(r.q_ult_kPa, "kPa", "MPa"),
-            "q_adm_kPa": r.q_adm_kPa,
+            "q_ult_kPa": r.q_ult,
+            "q_ult_MPa": convert(r.q_ult, "kPa", "MPa"),
+            "q_adm_kPa": q_adm,
             "Nc": r.Nc, "Nq": r.Nq, "Ngamma": r.Ngamma,
-            "code_applied": r.code_applied,
+            "B_eff_m": r.B_eff,
+            "L_eff_m": r.L_eff,
+            "code_applied": payload.code,
         }
 
     class GazetasPayload(BaseModel):

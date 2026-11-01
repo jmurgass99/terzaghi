@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "terzaghi"
-version = "1.1.0"
-description = "Geotecnia y cimentaciones en Python: capacidad portante EN 1997-1 Anexo D (excentricidad, inclinación, DA1/DA2), pilotes (α/β, curvas p-y, grupos, monopilotes), consolidación con drenes, licuefacción Boulanger-Idriss 2014, respuesta de sitio 1D, muelles de Gazetas, muros de gaviones, Mononobe-Okabe, túneles, durabilidad, AGS4→PLAXIS y API REST. 30 casos de uso ejecutados."
+version = "1.2.0"
+description = "Geotecnia y cimentaciones en Python: capacidad portante EN 1997-1 Anexo D (excentricidad, inclinación, nivel freático, DA1/DA2), pilotes (α/β, curvas p-y, grupos, monopilotes), consolidación con drenes, licuefacción Boulanger-Idriss 2014, respuesta de sitio 1D multicapa (Kramer 1996), muelles de Gazetas, muros de gaviones, Mononobe-Okabe, túneles, durabilidad, AGS4→PLAXIS y API REST."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -35,6 +35,9 @@ Issues = "https://github.com/jmurgass99/terzaghi/issues"
 
 [tool.setuptools.packages.find]
 include = ["terzaghi*"]
+
+[tool.setuptools.package-data]
+terzaghi = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
