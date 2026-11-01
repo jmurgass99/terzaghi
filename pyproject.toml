@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "terzaghi"
-version = "1.0.0"
-description = "Geotechnical analysis: bearing capacity (Terzaghi, Meyerhof, Vesic, Brinch Hansen), p-y curves and pile capacity, Gazetas SSI springs, consolidation, liquefaction (Boulanger-Idriss), site response, excavations, gabion walls, tunnels and AGS4 import."
+version = "1.1.0"
+description = "Geotecnia y cimentaciones en Python: capacidad portante EN 1997-1 Anexo D (excentricidad, inclinación, DA1/DA2), pilotes (α/β, curvas p-y, grupos, monopilotes), consolidación con drenes, licuefacción Boulanger-Idriss 2014, respuesta de sitio 1D, muelles de Gazetas, muros de gaviones, Mononobe-Okabe, túneles, durabilidad, AGS4→PLAXIS y API REST. 30 casos de uso ejecutados."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Jesús Murgas" }]
-keywords = ["geotechnical-engineering", "bearing-capacity", "p-y-curves", "piles", "liquefaction", "soil-structure-interaction", "consolidation", "eurocode-7"]
+keywords = ["geotechnical-engineering", "bearing-capacity", "eurocode-7", "p-y-curves", "piles", "pile-group", "liquefaction", "boulanger-idriss", "consolidation", "vertical-drains", "soil-structure-interaction", "gazetas", "site-response", "retaining-wall", "mononobe-okabe", "tunnel", "ags4", "plaxis", "loadpath"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",

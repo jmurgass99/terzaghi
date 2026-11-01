@@ -247,6 +247,8 @@ def create_app() -> Any:
     """App FastAPI standalone."""
     from fastapi import FastAPI
 
-    app = FastAPI(title="Terzaghi API", version="0.1.0")
+    from .. import __version__
+
+    app = FastAPI(title="Terzaghi API", version=__version__)
     app.include_router(create_router())
     return app

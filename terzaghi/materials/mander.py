@@ -77,9 +77,13 @@ def mander_confined_concrete(
     # Promedio de presiones (sección rectangular — Mander §3)
     fl_min = min(f_lx, f_ly)
     fl_max = max(f_lx, f_ly)
-    # Curva del nomograma Mander (aproximación cerrada de Paulay-Priestley)
-    K = 1.0 + 2.254 * sqrt(1.0 + 7.94 * fl_min / fc) - 2.0 * fl_min / fc \
-        - 1.254 if fl_min > 0 else 1.0
+    # Resistencia confinada, Mander et al. (1988) ec. 7 (confinamiento igual, f_l = f_l,min):
+    #     f'cc/f'co = −1,254 + 2,254·√(1 + 7,94·f'l/f'co) − 2·f'l/f'co
+    # Hasta la 1.1.0 la expresión llevaba un «1,0 +» de más (1 + 2,254·√(…) − 2x − 1,254),
+    # de modo que K salía exactamente 1,0 por encima del valor de la fuente: con 1 % de
+    # cuantía en cada dirección y f'c = 30 MPa devolvía K = 2,58 (f'cc = 77 MPa) donde
+    # Mander da 1,58 (47 MPa). El límite sin confinar (f_l → 0) debe ser K = 1.
+    K = (-1.254 + 2.254 * sqrt(1.0 + 7.94 * fl_min / fc) - 2.0 * fl_min / fc) if fl_min > 0 else 1.0
     K = max(K, 1.0)
     fcc = K * fc
     eps_c0 = 0.002
@@ -89,9 +93,14 @@ def mander_confined_concrete(
     rho_s = rho_x + rho_y
     eps_cu = 0.004 + 1.4 * rho_s * fyh * eps_su / fcc
 
-    # Curva σ-ε
+    # Curva σ-ε de Popovics: σ = f'cc·x·r/(r − 1 + x^r), x = ε/ε_cc,
+    # r = E_c/(E_c − E_sec) con E_c = 5000·√f'c (MPa) y E_sec = f'cc/ε_cc (Mander ec. 3–6).
+    # Hasta la 1.1.0 se usaba r = 5/(K − 1): para K = 1,6 daba r = 8 (rama descendente
+    # casi vertical) y para hormigón sin confinar r → ∞ (σ caía a cero tras el pico).
     eps = np.linspace(0.0, eps_cu, n_curve_points)
-    r = 5.0 / max(K - 1.0 + 1e-9, 1e-9)  # Ec/(Ec - Esec) simplificado
+    Ec = 5000.0 * sqrt(fc)
+    Esec = fcc / eps_cc
+    r = Ec / max(Ec - Esec, 1e-9)
     x = eps / eps_cc
     sigma = (fcc * x * r) / (r - 1.0 + np.where(x > 0, x ** r, 0.0))
     curve = list(zip(eps.tolist(), sigma.tolist()))

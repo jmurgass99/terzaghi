@@ -44,8 +44,7 @@ def analyze(inp: MokwaDuncanInput) -> MokwaDuncanResult:
         raise ValueError(f"code invalido: {inp.code}")
     # passive block (Rankine)
     phi = radians(inp.phi_deg)
-    Kp = (1 + tan(phi / 2 + pi / 4) ** 2)
-    Kp = ((1 + (tan(phi)) ** 2) ** 0.5 + tan(phi)) ** 2
+    Kp = ((1 + (tan(phi)) ** 2) ** 0.5 + tan(phi)) ** 2  # = tan²(45° + φ/2)
     Bf = inp.D_m + (inp.n_cols - 1) * inp.s_m
     Pp_block = 0.5 * Kp * inp.gamma_kN_m3 * inp.H_emb_m ** 2 * Bf + 2 * inp.c_kPa * (Kp ** 0.5) * inp.H_emb_m * Bf
     # individual con p-multiplier

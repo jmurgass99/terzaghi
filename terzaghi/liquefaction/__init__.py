@@ -17,6 +17,16 @@ from dataclasses import dataclass
 from math import exp
 from typing import Any
 
+from .boulanger_idriss import (
+    BoulangerIdrissInput,
+    BoulangerIdrissResult,
+    ProfileLiquefactionResult,
+    _k_sigma_bi2014,
+    _rd_bi2014,
+    evaluate_bi2014,
+    evaluate_spt_profile_liquefaction,
+)
+
 
 @dataclass(frozen=True)
 class LiquefactionInput:
@@ -46,11 +56,15 @@ class LiquefactionResult:
 
 
 def _r_d(depth_m: float, Mw: float) -> float:
-    """Factor reducción profundidad (Idriss 1999 / Boulanger 2014)."""
-    z = depth_m
-    alpha = -1.012 - 1.126 * (z / 11.73) if z < 34 else -1.012 - 1.126 * (34 / 11.73)
-    beta = 0.106 + 0.118 * (z / 11.28) if z < 34 else 0.106 + 0.118 * (34 / 11.28)
-    return float(exp(alpha + beta * Mw))
+    """Factor de reducción por profundidad r_d = exp(α(z) + β(z)·M), Idriss (1999) /
+    Boulanger & Idriss (2014) ec. 6–8, con α(z) = −1,012 − 1,126·sin(z/11,73 + 5,133) y
+    β(z) = 0,106 + 0,118·sin(z/11,28 + 5,142).
+
+    Hasta la 1.1.0 esta vía omitía los senos (α = −1,012 − 1,126·z/11,73, …): a 5 m daba
+    r_d = 0,74 en vez de 0,96 y a 10 m 0,61 en vez de 0,86, con lo que la demanda CSR
+    salía un 20–30 % baja. Ahora delega en ``boulanger_idriss._rd_bi2014``.
+    """
+    return float(_rd_bi2014(depth_m, Mw))
 
 
 def _CRR(N1_60_cs: float) -> float:
@@ -74,12 +88,13 @@ def _MSF(Mw: float, N1_60_cs: float) -> float:
 
 
 def _K_sigma(sigma_v_eff_kPa: float, N1_60_cs: float) -> float:
-    """Overburden correction factor."""
-    C_sigma = min(1.0 / (18.9 - 2.55 * min(N1_60_cs, 37) ** 0.5), 0.3)
-    Ksig = 1.0 - C_sigma * (sigma_v_eff_kPa / 100.0).__pow__(0.5) if False else (
-        1.0 - C_sigma * (sigma_v_eff_kPa / 100.0) ** 0.5
-    )
-    return float(max(min(Ksig, 1.1), 0.5))
+    """Factor de sobrecarga K_σ = 1 − C_σ·ln(σ'_v/P_a) ≤ 1,1 (B&I 2014 ec. 11/51).
+
+    Hasta la 1.1.0 esta vía usaba 1 − C_σ·√(σ'_v/100): valía 0,89 en vez de 1,0 a
+    100 kPa y 0,92 en vez de 1,08 a 50 kPa. Ahora delega en
+    ``boulanger_idriss._k_sigma_bi2014``.
+    """
+    return float(_k_sigma_bi2014(sigma_v_eff_kPa, N1_60_cs))
 
 
 def evaluate_liquefaction(inp: LiquefactionInput,
@@ -104,6 +119,10 @@ __all__ = [
     "LiquefactionInput",
     "LiquefactionResult",
     "evaluate_liquefaction",
+    "BoulangerIdrissInput",
+    "BoulangerIdrissResult",
+    "ProfileLiquefactionResult",
+    "evaluate_bi2014",
     "evaluate_spt_profile_liquefaction",
 ]
 
