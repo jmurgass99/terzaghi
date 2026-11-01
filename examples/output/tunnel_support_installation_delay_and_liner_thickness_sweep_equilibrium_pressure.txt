@@ -1,0 +1,21 @@
+R₀ = 4 m, P₀ = 800 kPa: P_cr = 408 kPa, convergencia libre 274.4 mm (6.86 % de R₀), R_p(P_i = 0) = 10.60 m
+
+Anillo de 250 mm según el momento de instalación:
+  conv. previa u_activación [mm] p_eq [kPa] p_eq/P₀ u_eq [mm] capacidad aro [kPa]  estado
+           10%              27.4      472.3   0.590      28.4                2812  STABLE
+           20%              54.9      300.1   0.375      55.5                2812  STABLE
+           30%              82.3      204.6   0.256      82.7                2812  STABLE
+           50%             137.2       97.7   0.122     137.4                2812  STABLE
+           70%             192.1       43.6   0.055     192.2                2812  STABLE
+           90%             246.9       11.6   0.015     247.0                2812  STABLE
+
+Instalación al 30 % según el espesor del anillo:
+  t [mm] K_s [kPa/mm] p_eq [kPa] u_eq [mm] capacidad aro [kPa]    uso  estado
+     100        195.3      202.8      83.4                1125   0.18  STABLE
+     150        293.0      203.8      83.0                1688   0.12  STABLE
+     200        390.6      204.3      82.8                2250   0.09  STABLE
+     250        488.3      204.6      82.7                2812   0.07  STABLE
+     300        585.9      204.8      82.7                3375   0.06  STABLE
+     400        781.2      205.1      82.6                4500   0.05  STABLE
+
+Retrasar el anillo del 10 al 50 % de la convergencia baja la presión que recibe de 472 a 98 kPa a costa de 110 mm más de convergencia: es el principio del NATM. A partir de 100 mm el anillo es tan rígido frente al terreno (K_s ≫ pendiente de la curva de reacción) que p_eq apenas depende del espesor: el equilibrio lo fija el momento de instalación, y el uso de la capacidad de aro se queda por debajo de 0,2. Un anillo rígido instalado muy pronto en terreno peor puede superar su capacidad de aro (uso > 1) y el paquete lo marca como colapso aunque el terreno sea estable.

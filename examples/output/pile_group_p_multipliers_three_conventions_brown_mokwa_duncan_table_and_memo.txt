@@ -1,0 +1,20 @@
+Grupo 3 × 3, D = 0.6 m, P_single = 200 kN (capacidad lateral de un pilote aislado)
+
+   s/D Brown 1988 (f_1, f_2, f_3)  η_Brown tabla M-D (f_1, f_2, f_3)  η_tabla memo f_m filas 2–3  η_memo  P_grupo [kN] Brown / tabla / memo
+   2.0            (0.8, 0.4, 0.3)    0.500           (1.0, 0.7, 0.5)    0.733              1.000   1.000      900 /   1320 /   1800
+   3.0            (0.8, 0.4, 0.3)    0.500           (1.0, 0.7, 0.5)    0.733              1.000   1.000      900 /   1320 /   1800
+   4.0           (0.9, 0.62, 0.5)    0.675           (1.0, 0.7, 0.5)    0.733              1.000   1.000     1215 /   1320 /   1800
+   5.0           (1.0, 0.85, 0.7)    0.850           (1.0, 0.7, 0.5)    0.733              1.000   1.000     1530 /   1320 /   1800
+   6.0           (1.0, 0.85, 0.7)    0.850           (1.0, 0.7, 0.5)    0.733              1.000   1.000     1530 /   1320 /   1800
+
+Memoria handcalcs para s/D = 3 (primeras líneas):
+    PASO 2: p-multipliers por fila (Mokwa-Duncan)
+    ----------------------------------------
+      Fila leading (row 1): fm = 1.0
+      Filas traseras: fm = min(0.64 + 0.36*(s/d), 1.0)
+      fm = min(0.64 + 0.36*3.000, 1.0)
+      fm = min(1.7200, 1.0) = 1.0000
+    
+      Fila 1 (leading): fm = 1.0000
+
+Lectura: Brown (1988) es el único de los tres que depende de la separación y coincide con los p-multiplicadores que piden las guías (FHWA, AASHTO) para 3 ≤ s/D ≤ 5. La tabla de `mokwa_duncan` es fija por fila y la fórmula de la memoria satura a 1 desde s/D = 1: la memoria documenta el procedimiento, pero su número no reduce la capacidad del grupo. Para proyecto, usar `pile_group_efficiency_lateral` y revisar la memoria a mano.

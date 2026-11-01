@@ -1,0 +1,17 @@
+Zapata 5.0 × 3.0 m, V_s = 180.0 m/s, ρ = 1850.0 kg/m³, ν = 0.35; V_La = 3,4·V_s/(π(1 − ν)) = 299.7 m/s; ξ_material = 5%
+
+Rigideces estáticas: K_z = 820,655 kN/m, K_x = 657,424, K_y = 597,484, K_rx = 1,737,776 kN·m/rad, K_ry = 3,947,657, K_t = 2,846,669
+Radiación (no depende de f): C_z = ρ·V_La·A = 8,317 kN·s/m, C_x = ρ·V_s·A = 4,995, C_rx = ρ·V_La·I_x = 6,238 kN·m·s/rad, C_ry = 17,326, C_t = 14,152
+
+  f [Hz]    a_0 K_z,din/K_z K_rx,din/K_rx K_ry,din/K_ry C_z total [kN·s/m]  ξ_eq,z   C_rx total  ξ_eq,rx C_mat/C_rad (z)
+     1.0  0.052       1.000         0.992         0.990             21,378    0.08       33,895     0.06           1.570
+     2.0  0.105       1.000         0.984         0.979             14,847    0.11       20,066     0.07           0.785
+     4.0  0.209       1.000         0.969         0.958             11,582    0.18       13,152     0.10           0.393
+     6.0  0.314       1.000         0.953         0.937             10,494    0.24       10,847     0.12           0.262
+     8.0  0.419       1.000         0.937         0.916              9,949    0.30        9,695     0.15           0.196
+    12.0  0.628       1.000         0.906         0.874              9,405    0.43        8,542     0.20           0.131
+    16.0  0.838       1.000         0.874         0.832              9,133    0.56        7,966     0.26           0.098
+    20.0  1.047       0.998         0.843         0.791              8,970    0.69        7,620     0.33           0.079
+
+A 1 Hz (periodos de edificio) manda el amortiguamiento material, 1,6 veces la radiación, porque C_mat = 2Kξ/ω crece al bajar ω; a 2 Hz van parejos y desde 4 Hz domina la radiación. El ξ_eq vertical pasa del 50 % hacia 15 Hz: por eso las cimentaciones superficiales en suelo firme apenas vibran verticalmente a frecuencias de maquinaria.
+Los factores k(a_0) y los dashpots de radiación son los de la tabla de Gazetas para cimentación superficial SIN los coeficientes c̄(a_0) de baja frecuencia (que reducen el amortiguamiento de balanceo a a_0 < 1): del lado optimista en rocking a frecuencias bajas.

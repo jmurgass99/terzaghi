@@ -1,0 +1,37 @@
+Perfiles del catálogo: santiago_grava, bogota_lacustre, lima_grava, andes_volcanico
+
+  santiago_grava:
+    estrato                        z [m] γ [kN/m³] φ′ [°] c′ [kPa] E_s [MPa]  N_60
+    Relleno                      0.0–2.0      17.0     28        0        15     8
+    Grava 1a depositacion        2.0–8.0      22.0     42        0       120    50
+    Grava 2a depositacion       8.0–20.0      23.0     45        5       200    60
+
+  bogota_lacustre:
+    estrato                        z [m] γ [kN/m³] φ′ [°] c′ [kPa] E_s [MPa]  N_60
+    Costra desecada              0.0–3.0      16.0      0       30         8     4
+    Arcilla blanda              3.0–25.0      13.0      0       25         4     2
+    Arcilla preconsolidada     25.0–50.0      16.0      0       80        20     8
+
+  lima_grava:
+    estrato                        z [m] γ [kN/m³] φ′ [°] c′ [kPa] E_s [MPa]  N_60
+    Suelo superficial            0.0–1.5      17.0     30        5        20    10
+    Grava aluvial               1.5–30.0      21.0     40        0       150    50
+
+  andes_volcanico:
+    estrato                        z [m] γ [kN/m³] φ′ [°] c′ [kPa] E_s [MPa]  N_60
+    Ceniza volcanica             0.0–5.0      14.0     32       10        25    12
+    Toba consolidada            5.0–20.0      19.0     38       50       100    40
+
+Zapata a 2 m en Bogotá cae en «Costra desecada» (φ' = 0, c = 30 kPa): q_ult no drenado ≈ (π + 2)·c_u·1,2 + γ·D = 217 kPa para zapata cuadrada; la arcilla blanda de debajo (c_u = 25 kPa, E_s = 4 MPa, 22 m) es la que manda en el asiento.
+
+Relleno limo-arenoso compactado: van Genuchten θ_r = 0.06, θ_s = 0.42, α = 0.8 1/m, n = 1.8 (m = 1 − 1/n = 0.444); c' = 5 kPa, φ' = 32°, σ = 60 kPa, u_a = 0
+   ψ [m] u_w [kPa]      θ  S_e = χ χ·(u_a − u_w) [kPa]  τ [kPa] τ/τ_sat
+     0.0      -0.0  0.420    1.000                 0.0     42.5    1.00
+     0.2      -2.0  0.414    0.984                 1.9     43.7    1.03
+     0.5      -4.9  0.393    0.925                 4.5     45.3    1.07
+     1.0      -9.8  0.347    0.796                 7.8     47.4    1.11
+     2.0     -19.6  0.271    0.586                11.5     49.7    1.17
+     5.0     -49.1  0.175    0.318                15.6     52.3    1.23
+    10.0     -98.1  0.128    0.188                18.4     54.0    1.27
+
+Con 2 m de succión la resistencia sube un 17 % y con 10 m un 27 %: χ cae con la succión pero en este rango (n = 1,8) el producto χ·s sigue creciendo; con n mayor (arenas uniformes) χ cae antes y el producto tiene máximo. Esa resistencia desaparece al saturarse el relleno (lluvia, rotura de una conducción): no se cuenta en proyecto salvo que se garantice el drenaje.

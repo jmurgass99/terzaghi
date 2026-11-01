@@ -1,0 +1,15 @@
+Zapata 2,5 × 2,5 m, D_f = 1,5 m, arena φ' = 32°, γ = 19 kN/m³ (EN 1997-1 Anexo D, N_γ de Chen):
+
+  caso                           B′ [m] L′ [m] A′ [m²]    i_q    i_γ q_ult [kPa]  R_k [kN] legacy/EC7
+  S1 centrada, vertical            2.50   2.50   6.250  1.000  1.000     1471.33      9196      0.933
+  S3 e_B = 0,30 m                  1.90   2.50   4.750  1.000  1.000     1312.76      6236      1.045
+  S4 H/V = 150/1000 kN             2.50   2.50   6.250  0.784  0.666     1098.87      6868      1.249
+  S5 e_B = 0,30 m + H/V            1.90   2.50   4.750  0.775  0.659      972.53      4620      1.411
+  S5b e_B = e_L = 0,30 m + H/V     1.90   1.90   3.610  0.784  0.666     1025.20      3701      1.339
+
+  La vía deprecada devuelve 1372.43 kPa en los cinco casos (no tiene e ni H): en S5 es un 41.1 % más que el Anexo D.
+  Exponente m para carga paralela a B': m = (2 + B'/L')/(1 + B'/L') = 1.568; i_q = (1 − H/V)^m = 0.775 (c' = 0)
+
+  H > 0 con V = 0 → ValueError: inclination_factors: H=150 kN>0 con V=0 kN<=0. La inclinación de carga drenada (Vesic / EN 1997-1 Anexo D) exi…
+
+Con la excentricidad el área efectiva cae un 24 % y q_ult un 11 %; la inclinación quita otro 25 %: los dos efectos se multiplican y ninguno es despreciable para una zapata de pilar con viento o sismo.

@@ -1,0 +1,17 @@
+Perfil: arena φ' = 28.0°, c' = 10.0 kPa, γ = 18.0 / γ_sat = 19.81 kN/m³, nivel freático a 1.5 m (base de la zapata)
+  z [m] σ_v [kPa]  u [kPa] σ′_v [kPa]
+    0.0      0.00     0.00       0.00
+    1.0     18.00     0.00      18.00
+    1.5     27.00     0.00      27.00
+    2.5     46.81     9.81      37.00
+    4.0     76.53    24.53      52.00
+    6.0    116.14    44.15      72.00
+  K_0 (Jaky) = 1 − sin φ' = 0.531; K_a = 0.361; K_p = 2.770
+
+Factores de Vesić a 28.0°: N_q = 14.720, N_c = 25.803, N_γ = 16.717
+A mano (ficha W00675 GT2): q_ult = 10.0·25.80 + 27·14.72 + ½·10.00·2.0·16.72 = 258.03 + 397.44 + 167.17 = 822.6 kPa (ficha: 822)
+`drained_bearing_capacity` (L = 200 m, γ' en el término de peso, q = γ·D_f aparte): q_ult = 825.3 kPa; s_q = 1.0047, s_c = 1.0050, s_γ = 0.9970
+Sin nivel freático (γ = 18 en los dos términos): 958.6 kPa → el agua en la base quita un 14 % (solo afecta al término de peso propio).
+Con N_γ del Anexo D (Chen, 2·(N_q − 1)·tan φ = 14.590): 804.1 kPa, un 2.6 % menos que con Vesić.
+
+La puerta `evaluate_bearing_ec7` no tiene nivel freático: si hay agua en la base, pásale γ' sabiendo que también lo usará en la sobrecarga (conservador); para separar los dos pesos usa `drained_bearing_capacity` directamente.

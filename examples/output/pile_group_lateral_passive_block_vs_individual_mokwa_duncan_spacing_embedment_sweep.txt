@@ -1,0 +1,28 @@
+Grupo 3 × 3, D = 0.6 m, arena φ' = 30.0° (K_p = 3.00), γ = 18.0 kN/m³, L = 12 m
+
+=== c = 0 kPa ===
+  s [m] H_emb [m] B_f [m] p_m medio bloque [kN] individuales [kN] H_grupo [kN]  gobierna
+    1.2       3.0    3.00     0.733         729               962          729  bloque
+    1.2       4.5    3.00     0.733        1640              2165         1640  bloque
+    1.2       6.0    3.00     0.733        2916              3849         2916  bloque
+    1.8       3.0    4.20     0.733        1021               962          962  pilotes
+    1.8       4.5    4.20     0.733        2296              2165         2165  pilotes
+    1.8       6.0    4.20     0.733        4082              3849         3849  pilotes
+    3.0       3.0    6.60     0.733        1604               962          962  pilotes
+    3.0       4.5    6.60     0.733        3609              2165         2165  pilotes
+    3.0       6.0    6.60     0.733        6415              3849         3849  pilotes
+
+=== c = 20 kPa ===
+  s [m] H_emb [m] B_f [m] p_m medio bloque [kN] individuales [kN] H_grupo [kN]  gobierna
+    1.2       3.0    3.00     0.733        1353              2138         1353  bloque
+    1.2       4.5    3.00     0.733        2576              3208         2576  bloque
+    1.2       6.0    3.00     0.733        4163              4277         4163  bloque
+    1.8       3.0    4.20     0.733        1894              2138         1894  bloque
+    1.8       4.5    4.20     0.733        3606              3208         3208  pilotes
+    1.8       6.0    4.20     0.733        5828              4277         4277  pilotes
+    3.0       3.0    6.60     0.733        2976              2138         2138  pilotes
+    3.0       4.5    6.60     0.733        5666              3208         3208  pilotes
+    3.0       6.0    6.60     0.733        9159              4277         4277  pilotes
+
+Comprobación a mano (s = 1,8, H = 4,5, c = 0): B_f = 0,6 + 2·1,8 = 4,2 m; bloque = ½·3.00·18·4,5²·4,2 = 2296 kN (2296); individual = ½·K_p·γ·H²·D = 328 kN × 9 × p_m = 0.733 → 2165 kN
+El bloque crece con la anchura del grupo (B_f) y los individuales con el número de pilotes y el empotramiento: la cohesión favorece más a los pilotes (9·c·D·H) que al bloque. El modelo es el de anteproyecto de Mokwa-Duncan; con encepado flexible o pilotes largos hace falta un análisis p-y completo.

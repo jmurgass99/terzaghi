@@ -1,0 +1,16 @@
+Arcilla c_u = 75 kPa, γ = 18 kN/m³, D_f = 1.5 m; N_c = π + 2 = 5.1416
+
+  caso                          s_c    i_c q_ult D.3 [kPa] puerta φ=0 [kPa] diferencia
+  C1 2,5 × 2,5 centrada       1.200  1.000         489.743          489.743   0.00e+00
+  C2 2,0 × 4,0 centrada       1.100  1.000         451.181          451.181   0.00e+00
+  C3 2,5 × 2,5, e_B = 0,30    1.152  1.000         471.234          471.234   0.00e+00
+  C4 2,5 × 2,5, H = 150 kN    1.200  0.912         449.166          449.166   0.00e+00
+
+Resistencia de diseño R_d = q_ult(c_u/γ_cu)·A'/γ_R;v para la zapata 2,5 × 2,5 centrada:
+  enfoque   γ_cu  γ_R;v c_u,d [kPa] q_ult [kPa]  R_k [kN]  R_d [kN]
+  DA1-C1    1.00   1.00       75.00       489.7      3061      3061
+  DA1-C2    1.40   1.00       53.57       357.5      2235      2235
+  DA2       1.00   1.40       75.00       489.7      3061      2186
+
+Comprobación a mano C1: s_c = 1 + 0,2·B'/L' = 1,2; q_ult = 5,1416·75·1,2 + 27 = 489.74 kPa.
+DA1-C2 reduce la resistencia del material (c_u/1,4) y DA2 la resistencia global (/1,4): no dan el mismo R_d (2235 frente a 2186 kN) porque el término q = γ·D_f no lleva c_u: DA2 lo divide por 1,4 y DA1-C2 lo deja intacto.

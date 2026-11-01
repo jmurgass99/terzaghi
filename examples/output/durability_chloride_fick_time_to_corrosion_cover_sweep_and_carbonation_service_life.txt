@@ -1,0 +1,23 @@
+Cloruros (ambiente marino, C_s = 0,8 %, C_crit = 0,4 % en peso de cemento): años hasta la iniciación según recubrimiento y difusividad
+  recubr. [mm] D =  2.0 mm²/año D =  5.0 mm²/año D = 10.0 mm²/año D = 20.0 mm²/año
+            30             494.6             197.8              98.9              49.5
+            40             879.2             351.7             175.8              87.9
+            50            1373.8             549.5             274.8             137.4
+            60            1978.3             791.3             395.7             197.8
+            70            2692.7            1077.1             538.5             269.3
+
+  Perfil a t = 274.8 años (D = 10, recubrimiento 50 mm): C(0) = 0.800, C(25 mm) = 0.589, C(50 mm) = 0.400 (= umbral), C(100 mm) = 0.142 %
+  Doblar el recubrimiento multiplica el tiempo por 4.0; con umbral 0,6 % en vez de 0,4 %: 1231.2 años; con C_crit ≥ C_s: inf
+
+Carbonatación: K_c [mm/√año] y vida útil hasta un recubrimiento de 30 y 50 mm
+   a/c % cenizas HR [%]    K_c d(50 años) [mm] t(30 mm) [años] t(50 mm) [años]
+  0.45         0     65   3.15            22.3              91             252
+  0.55         0     65   4.71            33.3              41             113
+  0.65         0     65   6.57            46.5              21              58
+  0.50        30     65   5.06            35.8              35              98
+  0.50         0     40   2.56            18.1             137             380
+  0.50         0     60   4.00            28.3              56             156
+  0.50         0     85   2.00            14.1             226             627
+  0.50         0     95   1.03             7.3             856            2377
+
+Un hormigón a/c 0,65 carbonata el doble de deprisa que uno a/c 0,45 (K ∝ (a/c)²) y la humedad del 60 % es la peor; saturado (95 %) casi no avanza. Los coeficientes (K_ref = 4 mm/√año, D en mm²/año) son valores de referencia del modelo, no de un ensayo: para una obra hay que medir D_app y C_s en testigos o usar los de la clase de exposición de EN 206 / fib MC.

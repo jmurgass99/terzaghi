@@ -1,0 +1,22 @@
+Factores parciales por enfoque de diseño (EN 1997-1 Anexo A, muros):
+  DA1a  γ_G = 1.35, γ_Q = 1.50, γ_φ = 1.00, γ_cu = 1.00, γ_Rh = 1.00, γ_Rb = 1.00
+  DA1b  γ_G = 1.00, γ_Q = 1.30, γ_φ = 1.00, γ_cu = 1.40, γ_Rh = 1.00, γ_Rb = 1.25
+  DA2   γ_G = 1.35, γ_Q = 1.50, γ_φ = 1.00, γ_cu = 1.00, γ_Rh = 1.10, γ_Rb = 1.00
+
+Muro de 5 cursos (H = 5 m, B = 3 m): FS = R_d/E_d por verificación
+  enfoque  condición   S_A [kN/m] ULS-1 hund. ULS-2 desl. ULS-3 vuelco
+  DA1a     no drenada        60.7        3.74        2.73         4.71
+  DA1a     drenada           95.4       11.49        2.42         3.32
+  DA1b     no drenada        60.7        2.89        2.64         5.08
+  DA1b     drenada           95.4       12.40        2.42         3.59
+  DA2      no drenada        60.7        3.74        2.48         4.71
+  DA2      drenada           95.4       11.49        2.20         3.32
+
+Cursos necesarios según la altura (DA1-a, no drenado): se quitan cursos por arriba
+  H [m]                 anchos [m] W [kN/m]  ULS-1  ULS-2  ULS-3 curso crítico ULS-6  gobierna
+      5  (1.0, 1.5, 2.0, 2.5, 3.0)      230   3.74   2.73   4.71 ULS-6 Curso 1 FS 2.69  ULS-2
+      4       (1.5, 2.0, 2.5, 3.0)      207   4.20   3.83   6.89 ULS-6 Curso 4 FS 3.88  ULS-2
+      3            (2.0, 2.5, 3.0)      172   5.25   5.79  10.73 ULS-6 Curso 3 FS 4.90  ULS-1
+      2                 (2.5, 3.0)      126   7.63  10.06  18.82 ULS-6 Curso 2 FS 6.24  ULS-1
+
+En las dos condiciones gobierna el deslizamiento (FS 2,2–2,7). En drenado el empuje es un 57 % mayor (γ en vez de γ − γ_w) y el deslizamiento baja a 2,4 (fricción N·tan φ'), mientras el hundimiento se dispara con N_q y N_γ de φ' = 34°. DA1-b castiga el hundimiento no drenado (c_u/1,4 y γ_Rb = 1,25: de 3,74 a 2,89) y DA2 el deslizamiento (γ_Rh = 1,1): hay que comprobar las dos combinaciones de DA1, no elegir una.

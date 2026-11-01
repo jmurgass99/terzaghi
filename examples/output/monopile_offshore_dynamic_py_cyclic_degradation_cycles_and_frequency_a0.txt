@@ -1,0 +1,24 @@
+=== clay — D = 7 m, z = 6 m, V_s = 180 m/s {'su_kPa': 90.0} ===
+  N ciclos f [Hz]    a_0 p_ult est. [kN/m] p_ult cíclico [kN/m] reducción mult. rigidez p_din(y = 50 mm) [kN/m]
+         1   0.20  0.049              2937                 2937      0.0%        1.0004                    1068
+         1   1.00  0.244              2937                 2937      0.0%        1.0090                    1078
+       100   0.20  0.049              2937                 2467     16.0%        1.0004                     897
+       100   1.00  0.244              2937                 2467     16.0%        1.0090                     905
+      1000   0.20  0.049              2937                 2232     24.0%        1.0004                     812
+      1000   1.00  0.244              2937                 2232     24.0%        1.0090                     819
+     10000   0.20  0.049              2937                 1997     32.0%        1.0004                     726
+     10000   1.00  0.244              2937                 1997     32.0%        1.0090                     733
+
+=== sand — D = 7 m, z = 6 m, V_s = 180 m/s {'phi_deg': 35.0, 'k_pH_kN_m3': 30000.0} ===
+  N ciclos f [Hz]    a_0 p_ult est. [kN/m] p_ult cíclico [kN/m] reducción mult. rigidez p_din(y = 50 mm) [kN/m]
+         1   0.20  0.049              2867                 2867      0.0%        1.0004                    2165
+         1   1.00  0.244              2867                 2867      0.0%        1.0090                    2183
+       100   0.20  0.049              2867                 2409     16.0%        1.0004                    1818
+       100   1.00  0.244              2867                 2409     16.0%        1.0090                    1834
+      1000   0.20  0.049              2867                 2179     24.0%        1.0004                    1645
+      1000   1.00  0.244              2867                 2179     24.0%        1.0090                    1659
+     10000   0.20  0.049              2867                 1950     32.0%        1.0004                    1472
+     10000   1.00  0.244              2867                 1950     32.0%        1.0090                    1485
+
+Arcilla, N = 1000: reducción = 1 − 0,08·log₁₀(1000) = 0.76; a_0 = 2π·0,2·7/180 = 0.0489, multiplicador 1 + 0,15·a_0² = 1.0004: p_ult cíclico 2232 kN/m, y_50 = 2,5·ε_50·D = 175 mm
+A frecuencias de rotor (0,2–1 Hz) a_0 < 0,25 y la rigidez dinámica apenas sube; lo que manda es la degradación cíclica: 10⁴ ciclos quitan un tercio de p_ult. DNV-RP-C212 pide curvas cíclicas calibradas con ensayos; estos coeficientes son de anteproyecto.

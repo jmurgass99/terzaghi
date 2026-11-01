@@ -1,0 +1,20 @@
+Muro H = 5 m, B = 3.0 m; K_a = (1 − sin 34°)/(1 + sin 34°) = 0.283 (ejemplo 0,28); W = 230 kN/m (230); M_estab = 431.2 kN·m/m
+Empuje activo característico S_A = ½·K_a·γ'·H² + K_a·q·H = 60.7 kN/m (γ' = γ − γ_w en no drenado); q_f = 5,14·c_u = 514 kPa
+Factores parciales DA1a: {'gG': 1.35, 'gQ': 1.5, 'gphi': 1.0, 'gcu': 1.0, 'gRh': 1.0, 'gRb': 1.0}
+
+  verificación                         E_d       R_d FS = R_d/E_d unidades  ok   ejemplo Hanif
+  ULS-1 Capacidad portante           356.4    1334.6         3.74     kN/m  True  3,3 (con B completa)
+  ULS-2 Deslizamiento                 68.0     185.8         2.73     kN/m  True  3,08
+  ULS-3 Vuelco                       113.3     533.2         4.71   kN*m/m  True  3,83
+
+Estabilidad interna (deslizamiento de cada curso sobre el inferior, ULS-6):
+  ULS-6 Curso 1 (deslizamiento)    H =    7.8 kN/m  R_d =   20.9 kN/m  FS =  2.69  ok
+  ULS-6 Curso 2 (deslizamiento)    H =   18.5 kN/m  R_d =   52.4 kN/m  FS =  2.83  ok
+  ULS-6 Curso 3 (deslizamiento)    H =   32.1 kN/m  R_d =   94.2 kN/m  FS =  2.94  ok
+  ULS-6 Curso 4 (deslizamiento)    H =   48.6 kN/m  R_d =  146.6 kN/m  FS =  3.02  ok
+  ULS-6 Curso 5 (deslizamiento)    H =   68.0 kN/m  R_d =  209.4 kN/m  FS =  3.08  ok
+
+Círculo global no drenado (r = 7.0 m, arco 13.4 m, bloque 372 kN/m con brazo 1.8 m): M_R = c_u·L_a·r = 9407, M_A = 670 kN·m/m → FS = 14.03
+`verify_full` devuelve 9 comprobaciones (3 externas + 5 cursos + 1 global).
+
+W, K_a y q_f coinciden con el ejemplo; los FS no son comparables uno a uno (3,7/2,7/4,7 frente a 3,3/3,08/3,83) porque el paquete aplica los factores parciales DA1-a a las acciones (γ_G = 1,35) y usa B' = B − 2e en el hundimiento, mientras el ejemplo compara valores característicos con B completa. Los datos del círculo global son de entrada (radio, arco, peso, brazo): el paquete no busca el círculo crítico; para eso está `slipcircle`.
