@@ -1,5 +1,7 @@
 # terzaghi — geotecnia y cimentaciones en Python: EN 1997-1 Anexo D, pilotes, consolidación, licuefacción, muelles de Gazetas, muros, túneles
 
+**Español** · [English](README.en.md) · [Português](README.pt.md) · [Italiano](README.it.md)
+
 Capacidad portante de zapatas por la ecuación completa del Anexo D de EN 1997-1 (área efectiva, inclinación de carga, factores parciales DA1/DA2, cláusula no drenada), pilotes (métodos α y β, curvas p-y de Matlock y Reese, grupos, monopilotes cíclicos), consolidación con drenes verticales (Terzaghi, Barron, Hansbo, Carrillo), licuefacción por SPT de Boulanger e Idriss (2014), respuesta de sitio 1D, muelles estáticos y dinámicos de Gazetas, muros de gaviones y empujes (Rankine, Coulomb, Mononobe-Okabe), excavaciones, túneles por convergencia-confinamiento, durabilidad del hormigón, hormigón confinado de Mander, lectura de AGS4 con salida a PLAXIS y una API REST. Dependencias: `numpy`, `pydantic`, `forallpeople`.
 
 [![CI](https://github.com/jmurgass99/terzaghi/actions/workflows/ci.yml/badge.svg)](https://github.com/jmurgass99/terzaghi/actions/workflows/ci.yml)
