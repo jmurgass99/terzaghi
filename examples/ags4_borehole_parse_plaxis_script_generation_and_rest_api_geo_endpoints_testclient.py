@@ -77,10 +77,16 @@ def main() -> None:
     print(f"  POST /tunnel-winkler → P_cr = {r['Pcr_kPa']:.1f} kPa, equilibrio {r['equilibrium_status']} a {r['equilibrium_pressure_kPa']:.1f} kPa, k_Winkler = {r['k_winkler_static_kN_m3']:,.0f} kN/m³")
     r = client.post("/api/geo/pile-group/lateral", json={"s_over_D": 4.0, "rows": 3}).json()
     print(f"  POST /pile-group/lateral (s/D = 4, 3 filas) → η = {r['global_efficiency']:.3f}; con rows = 0 → {client.post('/api/geo/pile-group/lateral', json={'s_over_D': 4.0, 'rows': 0}).status_code} (validación Pydantic)")
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        r = client.post("/api/geo/bearing-capacity", json={"B_m": 1.5, "L_m": 2.5, "D_f_m": 0.5, "phi_deg": 35.0, "c_kPa": 0.0, "gamma_kN_m3": 18.0, "method": "vesic", "code": "EU"}).json()
-    print(f"  POST /bearing-capacity (W00675) → q_ult = {r['q_ult_kPa']:.1f} kPa, q_adm = {r['q_adm_kPa']:.1f} kPa: es la vía DEPRECADA (factores de forma sin publicar, +2,6 % frente a los 903,5 del Anexo D); la puerta EC7 no tiene endpoint todavía.")
+    zap = {"B_m": 1.5, "L_m": 2.5, "D_f_m": 0.5, "phi_deg": 35.0, "c_kPa": 0.0, "gamma_kN_m3": 18.0, "code": "EU"}
+    q_anexo_d = 903.5   # W00675, EN 1997-1 Anexo D
+    print("  POST /bearing-capacity, zapata de W00675 (Anexo D publicado: 903,5 kPa):")
+    for etiqueta, extra in (("EC7 Anexo D, method = chen_ec7", {"method": "chen_ec7"}),
+                            ("EC7 con N_γ de Vesic, method = vesic", {"method": "vesic"}),
+                            ("vía DEPRECADA, use_ec7_canonical = False", {"method": "vesic", "use_ec7_canonical": False})):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            r = client.post("/api/geo/bearing-capacity", json={**zap, **extra}).json()
+        print(f"    {etiqueta:<42} q_ult = {r['q_ult_kPa']:6.1f} kPa ({r['q_ult_kPa'] / q_anexo_d - 1:+.1%}), q_adm = {r['q_adm_kPa']:.1f} kPa")
     print("\nEl lector AGS4 cubre PROJ/LOCA/GEOL/ISPT (no CPT ni laboratorio) y clasifica por la palabra CLAY en la descripción; el guion de PLAXIS necesita el servidor de Remote Scripting (puerto 10000) y la licencia correspondiente.")
 
 

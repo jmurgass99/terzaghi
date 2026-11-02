@@ -34,7 +34,7 @@ Geotechnical formulas are short but full of hidden decisions: which author's N_�
 pip install git+https://github.com/jmurgass99/terzaghi.git
 ```
 
-Extras: `api` (FastAPI + TestClient), `memos` (reports with handcalcs), `test`. For development: `git clone`, `pip install -e ".[test,api,memos]"`, `pytest -q` (37 test files; `tests/test_examples.py` runs the 30 examples as subprocesses). On Windows, if the console is not UTF-8, run the examples with `python -X utf8 examples/<name>.py`.
+Extras: `api` (FastAPI + TestClient), `memos` (reports with handcalcs), `test`. For development: `git clone`, `pip install -e ".[test,api,memos]"`, `pytest -q` (39 test files; `tests/test_examples.py` runs the 30 examples as subprocesses). On Windows, if the console is not UTF-8, run the examples with `python -X utf8 examples/<name>.py`.
 
 ## Capabilities
 
@@ -263,7 +263,7 @@ Grupo 3 × 3, D = 0.6 m, P_single = 200 kN (capacidad lateral de un pilote aisla
    6.0           (1.0, 0.85, 0.7)    0.850           (1.0, 0.7, 0.5)    0.733              1.000   1.000     1530 /   1320 /   1800
 
 Memoria handcalcs para s/D = 3 (primeras líneas):
-    PASO 2: p-multipliers por fila (Mokwa-Duncan)
+    PASO 2: p-multipliers por fila (Mokwa-Duncan (2001))
     ----------------------------------------
       Fila leading (row 1): fm = 1.0
       Filas traseras: fm = min(0.64 + 0.36*(s/d), 1.0)
@@ -754,7 +754,7 @@ Seno en f₀ (0,5 m/s²): amplificación 12.72, la cota 2/(πξ) de la capa sobr
 
 Espectro de respuesta en superficie (ξ = 5 %) del caso de ruido:
   T=0.10s T=0.20s T=0.30s T=0.50s T=0.60s T=0.80s T=1.00s T=2.00s
-   0.313g  0.612g  0.259g  0.577g  0.787g  0.274g  0.148g  0.057g
+   0.303g  0.613g  0.259g  0.577g  0.787g  0.274g  0.148g  0.057g
 
 Dos capas (arcilla 10 m V_s 150 + arena 20 m V_s 300): f_pico = 3.750 Hz frente a 1/(4·ΣH/V_s) = 1.875 Hz; amplificación 17.53; γ_máx por capa [0.246, 0.222] %
 
@@ -980,7 +980,10 @@ API REST (TestClient, sin servidor), versión 1.1.0:
   POST /py/matlock (z = 3, D = 0,8, s_u = 50) → 50 puntos, p_ult = 235.8 kN/m, y_máx = 640 mm
   POST /tunnel-winkler → P_cr = 120.1 kPa, equilibrio STABLE a 284.2 kPa, k_Winkler = 32,000 kN/m³
   POST /pile-group/lateral (s/D = 4, 3 filas) → η = 0.675; con rows = 0 → 422 (validación Pydantic)
-  POST /bearing-capacity (W00675) → q_ult = 927.1 kPa, q_adm = 662.2 kPa: es la vía DEPRECADA (factores de forma sin publicar, +2,6 % frente a los 903,5 del Anexo D); la puerta EC7 no tiene endpoint todavía.
+  POST /bearing-capacity, zapata de W00675 (Anexo D publicado: 903,5 kPa):
+    EC7 Anexo D, method = chen_ec7             q_ult =  903.5 kPa (-0.0%), q_adm = 645.3 kPa
+    EC7 con N_γ de Vesic, method = vesic       q_ult =  934.5 kPa (+3.4%), q_adm = 667.5 kPa
+    vía DEPRECADA, use_ec7_canonical = False   q_ult =  927.1 kPa (+2.6%), q_adm = 662.2 kPa
 
 El lector AGS4 cubre PROJ/LOCA/GEOL/ISPT (no CPT ni laboratorio) y clasifica por la palabra CLAY en la descripción; el guion de PLAXIS necesita el servidor de Remote Scripting (puerto 10000) y la licencia correspondiente.
 ```
@@ -997,7 +1000,7 @@ El lector AGS4 cubre PROJ/LOCA/GEOL/ISPT (no CPT ni laboratorio) y clasifica por
 
 ## Limitations
 
-- `evaluate_bearing_ec7` has no water table: it uses a single γ in the overburden and in the self-weight term (pass γ' if there is water at the base, conservative) and does not accept depth factors d_q/d_c or ground or base inclination. The `evaluate_bearing` route is deprecated (unpublished shape factors, blind to e and H: up to +41 % on the unsafe side) and is the one still served by the `/api/geo/bearing-capacity` endpoint.
+- `evaluate_bearing_ec7` accepts a water table since 4b875a1 (`zw_m`, `gamma_sat_kN_m3`: q′ at the base and γ′ interpolated in the wedge down to B_eff; not checked against a published case), but no depth factors d_q/d_c and no ground or base inclination. The `evaluate_bearing` route is deprecated (unpublished shape factors, blind to e and H: up to +41 % on the unsafe side); the `/api/geo/bearing-capacity` endpoint uses the EC7 route unless `use_ec7_canonical=false`, and `method="vesic"` changes N_γ, not the equation (the REST API use case shows it).
 - Three p-multiplier conventions coexist: `piles.group` (Brown 1988, depends on s/D), the fixed table of `piles.mokwa_duncan` and the formula f_m = 0.64 + 0.36·s/D of `memos.pile_group_lateral`, which saturates at 1 from s/D = 1 and reduces nothing in real cases. The sand curve of `integration.fastsap_pysprings.build_py_curve` is not Reese's (no reference; it gives roughly half): sample `py_reese_sand` for the springs. The cyclic (λ = 0.08) and dynamic (β = 0.15) coefficients of `piles.dynamic_py` are parametric, not code values.
 - `site_response.propagate_1d` multiplies 1/cos(k·h) per layer: exact for one layer over rigid bedrock, but with two layers the peak appears at twice the profile period and the amplification blows up (the impedance ratios are missing); the `wave_propagation_1d` module at the root is an older duplicate.
 - `check_excavation` computes the uplift FS with the excavation depth, not with the plug thickness or the aquifer head: it is an indicator, not the check. Base heave uses N_c = 5.14 without Skempton's shape and depth factors (safe side).

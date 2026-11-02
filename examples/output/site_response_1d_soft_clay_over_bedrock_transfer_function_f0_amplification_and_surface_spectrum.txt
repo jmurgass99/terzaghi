@@ -7,7 +7,7 @@ Seno en f₀ (0,5 m/s²): amplificación 12.72, la cota 2/(πξ) de la capa sobr
 
 Espectro de respuesta en superficie (ξ = 5 %) del caso de ruido:
   T=0.10s T=0.20s T=0.30s T=0.50s T=0.60s T=0.80s T=1.00s T=2.00s
-   0.313g  0.612g  0.259g  0.577g  0.787g  0.274g  0.148g  0.057g
+   0.303g  0.613g  0.259g  0.577g  0.787g  0.274g  0.148g  0.057g
 
 Dos capas (arcilla 10 m V_s 150 + arena 20 m V_s 300): f_pico = 3.750 Hz frente a 1/(4·ΣH/V_s) = 1.875 Hz; amplificación 17.53; γ_máx por capa [0.246, 0.222] %
 
