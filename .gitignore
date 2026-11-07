@@ -8,3 +8,7 @@ dist/
 .venv/
 
 # herramientas locales de agentes
+
+# salida de los ejemplos
+examples/output/
+examples/out/
